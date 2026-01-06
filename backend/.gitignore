@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Model files (large)
+trained_models/*.pth
+trained_models/*.pt
+
+# Temporary files
+uploads/*
+enhanced/*
+corrected/*
+*.log
+
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+# Environment
+.env

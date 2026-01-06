@@ -1,0 +1,25 @@
+# FastAPI and Server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Deep Learning
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Image Processing
+opencv-python==4.8.1.78
+pillow==10.1.0
+
+# OCR
+pytesseract==0.3.10
+
+# Data Processing
+numpy<2.0.0  # Changed: OpenCV needs NumPy 1.x
+
+# Environment and Config
+python-dotenv==1.0.0
+pydantic==2.5.0
+
+# Utilities
+tqdm==4.66.1

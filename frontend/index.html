@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Document Processor</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Medical Document Processor</h1>
+            <p>AI-Powered Document Enhancement, OCR & Language Correction</p>
+        </div>
+
+        <div class="content">
+            <!-- Upload Section -->
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-icon">📄</div>
+                <h2>Upload Medical Document</h2>
+                <p>Drag and drop your document here or click to browse</p>
+                <input type="file" id="fileInput" accept="image/*">
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    Choose File
+                </button>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section" id="previewSection">
+                <h3>Selected Document</h3>
+                <img id="previewImage" class="preview-image" alt="Preview">
+                <div class="button-container">
+                    <button class="btn btn-primary" id="processBtn">
+                        🚀 Process Document
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Results Section -->
+            <div id="resultsSection">
+                <h2 class="section-title">Processing Results</h2>
+
+                <!-- Stats -->
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="confidenceValue">--</div>
+                        <div class="stat-label">OCR Confidence</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="timeValue">--</div>
+                        <div class="stat-label">Processing Time</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="wordsValue">--</div>
+                        <div class="stat-label">Words Extracted</div>
+                    </div>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="results-grid">
+                    <!-- Enhanced Image -->
+                    <div class="result-card">
+                        <h3>✨ Enhanced Image</h3>
+                        <img id="enhancedImage" class="result-image" alt="Enhanced">
+                    </div>
+
+                    <!-- Corrected Image -->
+                    <div class="result-card">
+                        <h3>✅ Corrected Document</h3>
+                        <img id="correctedImage" class="result-image" alt="Corrected">
+                    </div>
+
+                    <!-- Original Text -->
+                    <div class="result-card">
+                        <h3>📝 Original OCR Text</h3>
+                        <div class="text-content" id="originalText"></div>
+                    </div>
+
+                    <!-- Corrected Text -->
+                    <div class="result-card">
+                        <h3>🔧 Corrected Text</h3>
+                        <div class="text-content" id="correctedText"></div>
+                    </div>
+                </div>
+
+                <!-- Download Section -->
+                <div class="download-section">
+                    <h3>📥 Download Results</h3>
+                    <div class="download-buttons">
+                        <a href="#" class="btn-download" id="downloadEnhanced">Download Enhanced Image</a>
+                        <a href="#" class="btn-download" id="downloadCorrected">Download Corrected Image</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-content">
+            <div class="spinner"></div>
+            <h2>Processing Document...</h2>
+            <p id="processingStatus">Enhancing image quality...</p>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
