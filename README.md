@@ -1,0 +1,91 @@
+✅ README.md
+# 🧪 Diabetes Lab Report Extraction and Interpretation Service
+
+## 📌 Introduction
+Laboratory reports related to diabetes monitoring often contain complex
+medical terminology, numerical values, reference ranges, and units that
+are difficult for patients to understand without professional guidance.
+Patients may need to spend additional time and money visiting a doctor
+only to interpret routine test results.
+
+This project aims to automate the extraction and interpretation of
+diabetes-related laboratory reports by converting report images into
+structured, patient-friendly explanations using OCR, a fine-tuned
+clinical language model, and rule-based medical interpretation.
+
+---
+
+## 🎯 Objectives
+- Extract text from diabetes lab report images
+- Identify medical test names, values, reference ranges, and units
+- Interpret results as low, normal, or high
+- Provide clear, patient-friendly explanations and advice
+
+---
+
+## 🧠 System Overview
+The backend service performs the following steps:
+
+1. Extracts text from lab report images using **Tesseract OCR**
+2. Identifies medical entities using a **fine-tuned ClinicalBERT model**
+3. Extracts numerical values, ranges, and units using rule-based logic
+4. Applies medical knowledge to interpret results with clinical meaning
+
+---
+
+## 🏗 Architecture
+
+backend/
+└── app/
+
+├── main.py # FastAPI application entry point
+
+├── ocr_ner.py # OCR, NER, extraction, and interpretation logic
+
+├── config.py # Medical knowledge base and test aliases
+
+└── models/ # Pretrained models (ignored in Git)
+
+---
+
+## 🚀 Running the Application
+
+### 1️⃣ Install dependencies
+```bash
+pip install -r requirements.txt
+
+2️⃣ Start the backend server
+uvicorn app.main:app --reload
+
+3️⃣ Access Swagger UI
+
+Open your browser and navigate to:
+
+http://127.0.0.1:8000/docs
+
+🔍 API Usage
+Upload Lab Report Image
+POST /upload_report/
+
+
+Input:
+
+Image file (PNG / JPG)
+
+Output:
+
+Extracted test results
+
+Reference ranges
+
+Clinical interpretation and advice
+
+
+🧰 Technologies Used
+
+FastAPI
+Tesseract OCR
+HuggingFace Transformers
+Fine-tuned ClinicalBERT
+Python
+Rule-based medical interpretation
