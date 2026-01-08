@@ -184,3 +184,7 @@ Healthcare applications
 Academic and educational purposes
 
 Assistive medical technology
+
+📌 Disclaimer
+This system is not a replacement for professional medical advice.
+It is intended as a supportive tool for healthcare and research applications
