@@ -147,6 +147,18 @@ FastAPI / Flask
 
 HuggingFace Transformers
 
+📁 Project Structure
+medical-backend/
+│
+├── app.py
+├── download_translation_models.py
+├── download_summarization_models.py
+├── requirements.txt
+├── .gitignore
+
+
+🔔 Fine-tuned models are downloaded dynamically or stored externally.
+
 PyTorch
 
 Text-to-Speech libraries
