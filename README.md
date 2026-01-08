@@ -15,3 +15,17 @@ Generate concise medical summaries from long clinical text
 Convert generated text into speech output
 
 Provide a reliable alternative for domain-specific medical language processing
+
+🧠 System Architecture
+
+The backend follows a modular AI pipeline:
+
+Input Processing – Receives medical text
+
+Translation Module – Converts text between supported languages
+
+Summarization Module – Produces concise medical summaries
+
+Text-to-Speech Module – Converts final text into audio
+
+API Layer – Exposes endpoints for integration
