@@ -126,3 +126,29 @@ Introduce speech-to-speech translation
 Support more regional languages
 
 Improve evaluation using BLEU and ROUGE metrics
+
+🧪 Planned Model Upgrade – BioBART
+
+Why BioBART?
+
+Pretrained on biomedical and clinical datasets
+
+Better understanding of medical terminology
+
+Produces more accurate medical summaries than general BART
+
+Reduces hallucinations in clinical summarization
+
+🛠 Technologies Used
+
+Python
+
+FastAPI / Flask
+
+HuggingFace Transformers
+
+PyTorch
+
+Text-to-Speech libraries
+
+Git & GitHub
