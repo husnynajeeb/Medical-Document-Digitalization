@@ -29,3 +29,38 @@ Summarization Module – Produces concise medical summaries
 Text-to-Speech Module – Converts final text into audio
 
 API Layer – Exposes endpoints for integration
+
+🤖 Models Used
+🔹 Translation Models
+
+Fine-tuned MarianMT / Transformer-based models
+
+Language pairs:
+
+English → Sinhala
+
+English → Tamil
+
+Why these models?
+
+Lightweight compared to large LLMs
+
+Can be fine-tuned with domain-specific (medical) data
+
+Faster inference for real-time applications
+
+⚠️ Fine-tuned model files are not included in the repository due to size limitations.
+
+🔹 Summarization Model
+
+BART-based summarization model
+
+Used for abstractive summarization of medical reports
+
+Why BART?
+
+Performs well on long structured text
+
+Generates fluent, human-readable summaries
+
+Suitable for future medical-specific fine-tuning
