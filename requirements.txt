@@ -1,4 +1,33 @@
-flask
+# Web framework
+fastapi
+uvicorn
+
+# Core ML / NLP
 torch
 transformers
 sentencepiece
+sacremoses
+
+# Summarization & Translation utilities
+numpy
+scipy
+
+# Text-to-Speech
+TTS
+
+# Audio handling
+soundfile
+librosa
+
+# Data handling
+pandas
+
+# API & utilities
+requests
+pydantic
+
+# Environment management
+python-dotenv
+
+# Logging & debugging
+loguru
