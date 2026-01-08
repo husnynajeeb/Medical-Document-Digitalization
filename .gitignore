@@ -1,0 +1,31 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
+
+# TTS / audio files
+*.mp3
+*.wav
+
+# Ignore large model files
+*.safetensors
+*.spm
+Models/en_ta_finetuned/
+en_si_finetuned/
+en_ta_finetuned/
