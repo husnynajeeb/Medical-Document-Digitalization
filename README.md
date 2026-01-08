@@ -98,3 +98,31 @@ Performs well on long structured text
 Generates fluent, human-readable summaries
 
 Suitable for future medical-specific fine-tuning
+
+⭐ Why This System Is Needed (Even with ChatGPT & Google Translate)
+
+One solid reason:
+
+This system is domain-specific, controllable, and deployable in restricted medical environments where public AI tools cannot be used.
+
+Medical data privacy is critical
+
+Hospitals cannot rely on public APIs
+
+General translators are not trained on medical terminology
+
+This system can be fine-tuned, audited, and deployed locally
+
+🔮 Future Improvements
+
+Fine-tune summarization using BioBART
+
+Improve translation accuracy using larger medical parallel datasets
+
+Add medical entity recognition
+
+Introduce speech-to-speech translation
+
+Support more regional languages
+
+Improve evaluation using BLEU and ROUGE metrics
