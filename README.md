@@ -147,6 +147,12 @@ FastAPI / Flask
 
 HuggingFace Transformers
 
+PyTorch
+
+Text-to-Speech libraries
+
+Git & GitHub
+
 📁 Project Structure
 medical-backend/
 │
@@ -155,12 +161,26 @@ medical-backend/
 ├── download_summarization_models.py
 ├── requirements.txt
 ├── .gitignore
-
-
 🔔 Fine-tuned models are downloaded dynamically or stored externally.
 
-PyTorch
+⚠️ Important Notes
 
-Text-to-Speech libraries
+Large model files are excluded using .gitignore
 
-Git & GitHub
+Model files must be downloaded or mounted separately
+
+Repository contains code only, not trained weights
+
+🚀 How to Run
+pip install -r requirements.txt
+python app.py
+
+👩‍⚕️ Intended Use
+
+Medical research support
+
+Healthcare applications
+
+Academic and educational purposes
+
+Assistive medical technology
