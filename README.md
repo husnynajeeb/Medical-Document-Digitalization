@@ -28,7 +28,7 @@ The backend service performs the following steps:
 
 1. Extracts text from lab report images using **Tesseract OCR**
 2. Identifies medical entities using a **fine-tuned ClinicalBERT model**
-3. Extracts numerical values, ranges, and units using rule-based logic
+3. Extracts numerical values, ranges, and units 
 4. Applies medical knowledge to interpret results with clinical meaning
 
 ---
