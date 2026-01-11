@@ -28,9 +28,9 @@ The system is developed as a backend-only service, which can be integrated with 
 4.🧠 Use of Large Language Models (LLMs)
 
 LLMs are used to:
-    Improve contextual understanding of medical text
-        Preserve semantic meaning during summarization
-            Support future enhancements such as medical Q&A and decision support
+    Improve contextual understanding of medical text || 
+    Preserve semantic meaning during summarization || 
+    Support future enhancements such as medical Q&A and decision support || 
     
 The system is designed to combine task-specific models with LLM capabilities, instead of relying entirely on a single large model.
 
