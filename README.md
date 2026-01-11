@@ -2,20 +2,19 @@
 
 1. 📌 Project Overview
 ----------------------
-
 This project is a Medical Language Processing Backend designed to support medical translation, medical text summarization, and text-to-speech output.
 It is mainly focused on healthcare-related content, where accuracy, terminology awareness, and language support are critical.
 The system is developed as a backend-only service, which can be integrated with any frontend or mobile application.
 
 2. 🎯 Objectives
-
+----------------------
   - Translate medical text accurately between English, Sinhala, and Tamil  
   - Generate concise medical summaries from long clinical text  
   - Convert generated text into speech output  
   - Provide a reliable alternative for domain-specific medical language processing
 
 3. 🧠 System Architecture
-
+----------------------
   The backend follows a modular AI pipeline:  
   - Input Processing – Receives medical text    
   - Translation Module – Converts text between supported languages    
@@ -27,7 +26,7 @@ The system is developed as a backend-only service, which can be integrated with 
   - Useful for accessibility and voice-based medical assistance
 
 4. 🧠 Use of Large Language Models (LLMs)
-
+----------------------
 - LLMs are used to:
     - Improve contextual understanding of medical text
     - Preserve semantic meaning during summarization 
@@ -36,7 +35,7 @@ The system is developed as a backend-only service, which can be integrated with 
 The system is designed to combine task-specific models with LLM capabilities, instead of relying entirely on a single large model.
 
 5. ❌ Models Experimented but Rejected
-
+----------------------
 - Generic Google Translate / API-based translation
     - Poor handling of medical terminology
     - No control over domain customization
@@ -48,6 +47,7 @@ The system is designed to combine task-specific models with LLM capabilities, in
     - API Layer – Exposes endpoints for integration
 
 6. 🤖 Models Used
+----------------------
 🔹 Translation Models
     - Fine-tuned MarianMT / Transformer-based models
         - Language pairs:
@@ -57,7 +57,7 @@ The system is designed to combine task-specific models with LLM capabilities, in
         - Lightweight compared to large LLMs
         - Can be fine-tuned with domain-specific (medical) data
         - Faster inference for real-time applications
-⚠️ Fine-tuned model files are not included in the repository due to size limitations.
+- ⚠️ Fine-tuned model files are not included in the repository due to size limitations.
 
 🔹 Summarization Model
     - BART-based summarization model
@@ -67,62 +67,71 @@ The system is designed to combine task-specific models with LLM capabilities, in
         - Generates fluent, human-readable summaries
         - Suitable for future medical-specific fine-tuning
 
-⭐ Why This System Is Needed (Even with ChatGPT & Google Translate)
-One solid reason:
-    This system is domain-specific, controllable, and deployable in restricted medical environments where public AI tools cannot be used.
-    Medical data privacy is critical
-    Hospitals cannot rely on public APIs
-    General translators are not trained on medical terminology
-    This system can be fine-tuned, audited, and deployed locally
+7. ⭐ Why This System Is Needed (Even with ChatGPT & Google Translate)
+----------------------
+- One solid reason:
+    - This system is domain-specific, controllable, and deployable in restricted medical environments where public AI tools cannot be used.
+    - Medical data privacy is critical
+    - Hospitals cannot rely on public APIs
+    - General translators are not trained on medical terminology
+    - This system can be fine-tuned, audited, and deployed locally
 
-🔮 Future Improvements
-    Fine-tune summarization using BioBART
-    Improve translation accuracy using larger medical parallel datasets
-    Add medical entity recognition
-    Introduce speech-to-speech translation
-    Support more regional languages
-    Improve evaluation using BLEU and ROUGE metrics
+8. 🔮 Future Improvements
+----------------------
+  - Fine-tune summarization using BioBART
+  - Improve translation accuracy using larger medical parallel datasets
+  - Add medical entity recognition
+  - Introduce speech-to-speech translation
+  - Support more regional languages
+  - Improve evaluation using BLEU and ROUGE metrics
 
-🧪 Planned Model Upgrade – BioBART
-Why BioBART?
-    Pretrained on biomedical and clinical datasets
-    Better understanding of medical terminology
-    Produces more accurate medical summaries than general BART
-    Reduces hallucinations in clinical summarization
+9. 🧪 Planned Model Upgrade – BioBART
+----------------------
+- Why BioBART?
+    - Pretrained on biomedical and clinical datasets
+    - Better understanding of medical terminology
+    - Produces more accurate medical summaries than general BART
+    - Reduces hallucinations in clinical summarization
 
-🛠 Technologies Used
-Python
-FastAPI / Flask
-HuggingFace Transformers
-PyTorch
-Text-to-Speech libraries
-Git & GitHub
+9. 🛠 Technologies Used
+----------------------
+- Python
+- FastAPI / Flask
+- HuggingFace Transformers
+- PyTorch
+- Text-to-Speech libraries
+- Git & GitHub
 
-📁 Project Structure
-medical-backend/
-│
-├── app.py
-├── download_translation_models.py
-├── download_summarization_models.py
-├── requirements.txt
-├── .gitignore
-🔔 Fine-tuned models are downloaded dynamically or stored externally.
+10. 📁 Project Structure
+----------------------
+    medical-backend/
+    │
+    ├── app.py
+    ├── download_translation_models.py
+    ├── download_summarization_models.py
+    ├── requirements.txt
+    ├── .gitignore
+-🔔 Fine-tuned models are downloaded dynamically or stored externally.
 
-⚠️ Important Notes
-    Large model files are excluded using .gitignore
-    Model files must be downloaded or mounted separately
-    Repository contains code only, not trained weights
+11. ⚠️ Important Notes
+----------------------
+  - Large model files are excluded using .gitignore
+  - Model files must be downloaded or mounted separately
+  - Repository contains code only, not trained weights
 
-🚀 How to Run
-pip install -r requirements.txt
-python app.py
+12. 🚀 How to Run
+----------------------
+  - pip install -r requirements.txt
+  - python app.py
 
-👩‍⚕️ Intended Use
-    Medical research support
-    Healthcare applications
-    Academic and educational purposes
-    Assistive medical technology
+13. 👩‍⚕️ Intended Use
+----------------------
+  - Medical research support
+  - Healthcare applications
+  - Academic and educational purposes
+  - Assistive medical technology
 
-📌 Disclaimer
-This system is not a replacement for professional medical advice.
-It is intended as a supportive tool for healthcare and research applications
+14. 📌 Disclaimer
+----------------------
+  - This system is not a replacement for professional medical advice.
+  - It is intended as a supportive tool for healthcare and research applications
