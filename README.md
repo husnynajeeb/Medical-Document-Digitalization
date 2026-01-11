@@ -5,6 +5,7 @@
 This project is a Medical Language Processing Backend designed to support medical translation, medical text summarization, and text-to-speech output.
 It is mainly focused on healthcare-related content, where accuracy, terminology awareness, and language support are critical.
 The system is developed as a backend-only service, which can be integrated with any frontend or mobile application.
+
 ----------------------
 2. 🎯 Objectives
 
@@ -33,6 +34,7 @@ The system is developed as a backend-only service, which can be integrated with 
     - Support future enhancements such as medical Q&A and decision support
     
 The system is designed to combine task-specific models with LLM capabilities, instead of relying entirely on a single large model.
+
 ----------------------
 5. ❌ Models Experimented but Rejected
 
@@ -66,6 +68,7 @@ The system is designed to combine task-specific models with LLM capabilities, in
         - Performs well on long structured text
         - Generates fluent, human-readable summaries
         - Suitable for future medical-specific fine-tuning
+        
 ----------------------
 7. ⭐ Why This System Is Needed (Even with ChatGPT & Google Translate)
 
@@ -112,6 +115,7 @@ The system is designed to combine task-specific models with LLM capabilities, in
         ├── requirements.txt
         ├── .gitignore
 -🔔 Fine-tuned models are downloaded dynamically or stored externally.
+
 ----------------------
 11. ⚠️ Important Notes
 
