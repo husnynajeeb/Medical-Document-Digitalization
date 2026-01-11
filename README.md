@@ -1,22 +1,21 @@
 🩺 Medical Language Processing Backend
 
-1.📌 Project Overview
+1. 📌 Project Overview
 
 This project is a Medical Language Processing Backend designed to support medical translation, medical text summarization, and text-to-speech output.
 It is mainly focused on healthcare-related content, where accuracy, terminology awareness, and language support are critical.
 The system is developed as a backend-only service, which can be integrated with any frontend or mobile application.
 
-2.🎯 Objectives
+2. 🎯 Objectives
 
   - Translate medical text accurately between English, Sinhala, and Tamil  
   - Generate concise medical summaries from long clinical text  
   - Convert generated text into speech output  
   - Provide a reliable alternative for domain-specific medical language processing
 
-3.🧠 System Architecture
+3. 🧠 System Architecture
 
-  The backend follows a modular AI pipeline: 
-  
+  The backend follows a modular AI pipeline:  
   - Input Processing – Receives medical text    
   - Translation Module – Converts text between supported languages    
   - Summarization Module – Produces concise medical summaries
@@ -26,7 +25,7 @@ The system is developed as a backend-only service, which can be integrated with 
   - Converts translated or summarized medical text into audio 
   - Useful for accessibility and voice-based medical assistance
 
-4.🧠 Use of Large Language Models (LLMs)
+4. 🧠 Use of Large Language Models (LLMs)
 
 - LLMs are used to:
     - Improve contextual understanding of medical text
@@ -35,20 +34,19 @@ The system is developed as a backend-only service, which can be integrated with 
     
 The system is designed to combine task-specific models with LLM capabilities, instead of relying entirely on a single large model.
 
-5.❌ Models Experimented but Rejected
+5. ❌ Models Experimented but Rejected
 
-Generic Google Translate / API-based translation
-  Poor handling of medical terminology
-    No control over domain customization
-Very large LLM-only approaches
-  High computational cost
-    Not suitable for offline or private deployment
-      Slower response times
-  
-Text-to-Speech Module – Converts final text into audio
-  API Layer – Exposes endpoints for integration
+- Generic Google Translate / API-based translation
+    - Poor handling of medical terminology
+    - No control over domain customization
+- Very large LLM-only approaches
+    - High computational cost
+    - Not suitable for offline or private deployment
+    - Slower response times
+-Text-to-Speech Module – Converts final text into audio
+    - API Layer – Exposes endpoints for integration
 
-🤖 Models Used
+6. 🤖 Models Used
 🔹 Translation Models
 Fine-tuned MarianMT / Transformer-based models
     Language pairs:
