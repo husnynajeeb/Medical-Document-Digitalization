@@ -23,14 +23,14 @@ The system is developed as a backend-only service, which can be integrated with 
 🔹 Text-to-Speech (TTS)
 
   Converts translated or summarized medical text into audio
-  Useful for accessibility and voice-based medical assistance
+    Useful for accessibility and voice-based medical assistance
 
 4.🧠 Use of Large Language Models (LLMs)
 
 LLMs are used to:
     Improve contextual understanding of medical text
-    Preserve semantic meaning during summarization
-    Support future enhancements such as medical Q&A and decision support
+        Preserve semantic meaning during summarization
+            Support future enhancements such as medical Q&A and decision support
     
 The system is designed to combine task-specific models with LLM capabilities, instead of relying entirely on a single large model.
 
@@ -38,11 +38,11 @@ The system is designed to combine task-specific models with LLM capabilities, in
 
 Generic Google Translate / API-based translation
   Poor handling of medical terminology
-  No control over domain customization
+    No control over domain customization
 Very large LLM-only approaches
   High computational cost
-  Not suitable for offline or private deployment
-  Slower response times
+    Not suitable for offline or private deployment
+      Slower response times
   
 Text-to-Speech Module – Converts final text into audio
   API Layer – Exposes endpoints for integration
