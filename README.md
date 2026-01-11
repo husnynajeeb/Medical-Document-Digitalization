@@ -16,14 +16,15 @@ The system is developed as a backend-only service, which can be integrated with 
 3.🧠 System Architecture
 
   The backend follows a modular AI pipeline:
-    Input Processing – Receives medical text    
-    Translation Module – Converts text between supported languages    
-    Summarization Module – Produces concise medical summaries
+    
+  -Input Processing – Receives medical text    
+  -Translation Module – Converts text between supported languages    
+  -Summarization Module – Produces concise medical summaries
 
 🔹 Text-to-Speech (TTS)
 
   Converts translated or summarized medical text into audio
-   Useful for accessibility and voice-based medical assistance
+  Useful for accessibility and voice-based medical assistance
 
 4.🧠 Use of Large Language Models (LLMs)
 
