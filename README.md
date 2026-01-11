@@ -52,22 +52,22 @@ The system is designed to combine task-specific models with LLM capabilities, in
 
 🔹 Translation Models
     - Fine-tuned MarianMT / Transformer-based models
-        - Language pairs:
-        - English → Sinhala
-        - English → Tamil
+      - Language pairs:
+      - English → Sinhala
+      - English → Tamil
     - Why these models?
-        - Lightweight compared to large LLMs
-        - Can be fine-tuned with domain-specific (medical) data
-        - Faster inference for real-time applications
-- ⚠️ Fine-tuned model files are not included in the repository due to size limitations.
+      - Lightweight compared to large LLMs
+      - Can be fine-tuned with domain-specific (medical) data
+      - Faster inference for real-time applications
+⚠️ Fine-tuned model files are not included in the repository due to size limitations.
 
 🔹 Summarization Model
     - BART-based summarization model
-        - Used for abstractive summarization of medical reports
+      - Used for abstractive summarization of medical reports
     - Why BART?
-        - Performs well on long structured text
-        - Generates fluent, human-readable summaries
-        - Suitable for future medical-specific fine-tuning
+      - Performs well on long structured text
+      - Generates fluent, human-readable summaries
+      - Suitable for future medical-specific fine-tuning
         
 ----------------------
 7. ⭐ Why This System Is Needed (Even with ChatGPT & Google Translate)
