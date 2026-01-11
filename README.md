@@ -8,32 +8,34 @@ The system is developed as a backend-only service, which can be integrated with 
 
 2.🎯 Objectives
 
-  Translate medical text accurately between English, Sinhala, and Tamil
-  
-  Generate concise medical summaries from long clinical text
-  
-  Convert generated text into speech output
-  
+  Translate medical text accurately between English, Sinhala, and Tamil  
+  Generate concise medical summaries from long clinical text  
+  Convert generated text into speech output  
   Provide a reliable alternative for domain-specific medical language processing
 
-🧠 System Architecture
+3.🧠 System Architecture
+
   The backend follows a modular AI pipeline:
   Input Processing – Receives medical text
   Translation Module – Converts text between supported languages
   Summarization Module – Produces concise medical summaries
 
 🔹 Text-to-Speech (TTS)
+
   Converts translated or summarized medical text into audio
   Useful for accessibility and voice-based medical assistance
 
-🧠 Use of Large Language Models (LLMs)
+4.🧠 Use of Large Language Models (LLMs)
+
 LLMs are used to:
     Improve contextual understanding of medical text
     Preserve semantic meaning during summarization
     Support future enhancements such as medical Q&A and decision support
+    
 The system is designed to combine task-specific models with LLM capabilities, instead of relying entirely on a single large model.
 
-❌ Models Experimented but Rejected
+5.❌ Models Experimented but Rejected
+
 Generic Google Translate / API-based translation
   Poor handling of medical terminology
   No control over domain customization
