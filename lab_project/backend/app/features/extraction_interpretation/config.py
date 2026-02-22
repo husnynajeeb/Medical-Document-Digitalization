@@ -1,12 +1,13 @@
-# app/config.py
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Use the folder directly containing config.json and model files
-MODEL_PATH = os.path.abspath(os.path.join(BASE_DIR, "../models/clinicalbert"))
+MODEL_PATH = os.path.abspath(
+    os.path.join(BASE_DIR, "../../../models/clinicalbert")
+)
 
 TEST_KNOWLEDGE = {
+    # ----- Glucose -----
     "FASTING BLOOD SUGAR": {
         "unit": "mg/dl",
         "range": "70-110",
@@ -28,6 +29,29 @@ TEST_KNOWLEDGE = {
         "advice_high": "Indicates poor long-term glucose control.",
         "advice_low": "Usually not clinically concerning."
     },
+    "VENOUS BLOOD GLUCOSE": {
+        "unit": "mg/dl",
+        "range": "70-110",
+        "meaning": "Measures blood sugar in venous blood, usually fasting.",
+        "advice_high": "May indicate hyperglycemia; monitor diet and consult a doctor.",
+        "advice_low": "May indicate hypoglycemia; consult a doctor."
+    },
+    "RANDOM BLOOD SUGAR": {
+        "unit": "mg/dl",
+        "range": "70-140",
+        "meaning": "Measures blood sugar at any random time of the day.",
+        "advice_high": "May indicate diabetes; monitor blood sugar and consult a doctor.",
+        "advice_low": "May indicate hypoglycemia; monitor and consult a doctor."
+    },
+    "OGTT 2-HOUR": {
+        "unit": "mg/dl",
+        "range": "70-140",
+        "meaning": "Measures blood sugar 2 hours after oral glucose.",
+        "advice_high": "May indicate impaired glucose tolerance or diabetes.",
+        "advice_low": "May indicate hypoglycemia."
+    },
+
+    # ----- Kidney -----
     "CREATININE": {
         "unit": "mg/dl",
         "range": "0.7-1.3",
@@ -56,6 +80,29 @@ TEST_KNOWLEDGE = {
         "advice_high": "Usually not concerning.",
         "advice_low": "May indicate chronic kidney disease."
     },
+    "URINE MICRO ALBUMIN (UMA)": {
+        "unit": "mg/L",
+        "range": "0-30",
+        "meaning": "Measures the amount of albumin in urine, indicating kidney health.",
+        "advice_high": "May indicate early kidney damage; consult your doctor.",
+        "advice_low": "Normal."
+    },
+    "URINE CREATININE": {
+        "unit": "mg/dl",
+        "range": "50-200",
+        "meaning": "Creatinine level in urine, used for kidney assessment.",
+        "advice_high": "May indicate kidney issues.",
+        "advice_low": "Usually normal."
+    },
+    "UMA/CREATININE": {
+        "unit": "mg/g",
+        "range": "0-30",
+        "meaning": "Ratio of urine microalbumin to creatinine; better indicator of kidney function.",
+        "advice_high": "May indicate kidney damage; consult your doctor.",
+        "advice_low": "Normal."
+    },
+
+    # ----- Lipid Profile -----
     "TOTAL CHOLESTEROL": {
         "unit": "mg/dl",
         "range": "125-200",
@@ -77,25 +124,18 @@ TEST_KNOWLEDGE = {
         "advice_high": "Reduce saturated fats and consult a doctor.",
         "advice_low": "Optimal level."
     },
-    "TRIGLYCERIDES": {
-        "unit": "mg/dl",
-        "range": "0-150",
-        "meaning": "Measures fat levels in blood.",
-        "advice_high": "Reduce sugar, alcohol, and refined carbs.",
-        "advice_low": "Usually not concerning."
-    },
-    "URINE MICRO ALBUMIN (UMA)": {
-        "unit": "mg/L",
-        "range": "0-30",
-        "meaning": "Measures the amount of albumin in urine, indicating kidney health.",
-        "advice_high": "May indicate early kidney damage; consult your doctor.",
-        "advice_low": "Normal."
-    },
     "VLDL CHOLESTEROL": {
         "unit": "mg/dl",
         "range": "0-39",
         "meaning": "Very Low Density Lipoprotein cholesterol, linked to heart risk.",
         "advice_high": "Reduce sugar, refined carbs, and alcohol.",
+        "advice_low": "Usually not concerning."
+    },
+    "TRIGLYCERIDES": {
+        "unit": "mg/dl",
+        "range": "0-150",
+        "meaning": "Measures fat levels in blood.",
+        "advice_high": "Reduce sugar, alcohol, and refined carbs.",
         "advice_low": "Usually not concerning."
     },
     "CHO : HDL CHOL. RATIO": {
@@ -105,20 +145,8 @@ TEST_KNOWLEDGE = {
         "advice_high": "Maintain healthy diet, exercise regularly.",
         "advice_low": "Optimal."
     },
-    "URINE CREATININE": {
-        "unit": "mg/dl",
-        "range": "50-200",
-        "meaning": "Creatinine level in urine, used for kidney assessment.",
-        "advice_high": "May indicate kidney issues.",
-        "advice_low": "Usually normal."
-    },
-    "UMA/CREATININE": {
-        "unit": "mg/g",
-        "range": "0-30",
-        "meaning": "Ratio of urine microalbumin to creatinine; better indicator of kidney function.",
-        "advice_high": "May indicate kidney damage; consult your doctor.",
-        "advice_low": "Normal."
-    },
+
+    # ----- Proteins & Liver -----
     "TOTAL PROTEINS": {
         "unit": "g/dl",
         "range": "6.0-8.3",
@@ -182,90 +210,8 @@ TEST_KNOWLEDGE = {
         "advice_high": "May indicate liver or bone disease.",
         "advice_low": "Usually not concerning."
     },
-    "OGTT 2-HOUR": {
-        "unit": "mg/dl",
-        "range": "70-140",
-        "meaning": "Measures blood sugar 2 hours after oral glucose.",
-        "advice_high": "May indicate impaired glucose tolerance or diabetes.",
-        "advice_low": "May indicate hypoglycemia."
-    },
-    "WBC": {
-        "unit": "10^3/uL",
-        "range": "4.0-11.0",
-        "meaning": "White blood cell count, indicates immune status.",
-        "advice_high": "May indicate infection or inflammation.",
-        "advice_low": "May indicate bone marrow issues or immunodeficiency."
-    },
-    "RBC": {
-        "unit": "10^6/uL",
-        "range": "4.2-5.9",
-        "meaning": "Red blood cell count, important for oxygen transport.",
-        "advice_high": "May indicate dehydration or polycythemia.",
-        "advice_low": "May indicate anemia."
-    },
-    "HEMOGLOBIN": {
-        "unit": "g/dl",
-        "range": "13.5-17.5",
-        "meaning": "Oxygen-carrying protein in red blood cells.",
-        "advice_high": "May indicate dehydration or polycythemia.",
-        "advice_low": "May indicate anemia."
-    },
-    "HEMATOCRIT": {
-        "unit": "%",
-        "range": "41-53",
-        "meaning": "Proportion of red blood cells in blood.",
-        "advice_high": "May indicate dehydration or polycythemia.",
-        "advice_low": "May indicate anemia."
-    },
-    "PLATELETS": {
-        "unit": "10^3/uL",
-        "range": "150-450",
-        "meaning": "Platelet count; important for clotting.",
-        "advice_high": "May indicate inflammation or bone marrow disorder.",
-        "advice_low": "May indicate risk of bleeding."
-    },
-    "RDW": {
-        "unit": "%",
-        "range": "11.5-14.5",
-        "meaning": "Red cell distribution width; variability in RBC size.",
-        "advice_high": "May indicate anemia.",
-        "advice_low": "Usually not concerning."
-    },
-    "RDW-SD": {
-        "unit": "fL",
-        "range": "39-46",
-        "meaning": "Red cell distribution width standard deviation.",
-        "advice_high": "May indicate anemia.",
-        "advice_low": "Usually normal."
-    },
-    "PDW": {
-        "unit": "%",
-        "range": "9-17",
-        "meaning": "Platelet distribution width; variability in platelet size.",
-        "advice_high": "May indicate platelet activation.",
-        "advice_low": "Usually normal."
-    },
-    "PCT": {
-        "unit": "%",
-        "range": "0.22-0.24",
-        "meaning": "Plateletcrit; total platelet mass in blood.",
-        "advice_high": "May indicate clotting disorders.",
-        "advice_low": "May indicate risk of bleeding."
-    },
-    "VENOUS BLOOD GLUCOSE": {
-        "unit": "mg/dl",
-        "range": "70-110",
-        "meaning": "Measures blood sugar in venous blood, usually fasting.",
-        "advice_high": "May indicate hyperglycemia; monitor diet and consult a doctor.",
-        "advice_low": "May indicate hypoglycemia; consult a doctor."
-    },
-    "RANDOM BLOOD SUGAR": {
-        "unit": "mg/dl",
-        "range": "70-140",
-        "meaning": "Measures blood sugar at any random time of the day.",
-        "advice_high": "May indicate diabetes; monitor blood sugar and consult a doctor.",
-        "advice_low": "May indicate hypoglycemia; monitor and consult a doctor."
-    },
+
+    # ----- Urine -----
     "URINE FULL REPORT (UFR)": {
         "unit": "various",
         "range": "",
@@ -371,7 +317,44 @@ TEST_KNOWLEDGE = {
         "advice_high": "May indicate risk of kidney stones.",
         "advice_low": "Normal."
     },
-    # Hematology
+
+    # ----- Hematology -----
+    "WBC": {
+        "unit": "10^3/uL",
+        "range": "4.0-11.0",
+        "meaning": "White blood cell count, indicates immune status.",
+        "advice_high": "May indicate infection or inflammation.",
+        "advice_low": "May indicate bone marrow issues or immunodeficiency."
+    },
+    "RBC": {
+        "unit": "10^6/uL",
+        "range": "4.2-5.9",
+        "meaning": "Red blood cell count, important for oxygen transport.",
+        "advice_high": "May indicate dehydration or polycythemia.",
+        "advice_low": "May indicate anemia."
+    },
+    "HEMOGLOBIN": {
+        "unit": "g/dl",
+        "range": "13.5-17.5",
+        "meaning": "Oxygen-carrying protein in red blood cells.",
+        "advice_high": "May indicate dehydration or polycythemia.",
+        "advice_low": "May indicate anemia."
+    },
+    "HEMATOCRIT": {
+        "unit": "%",
+        "range": "41-53",
+        "meaning": "Proportion of red blood cells in blood.",
+        "advice_high": "May indicate dehydration or polycythemia.",
+        "advice_low": "May indicate anemia."
+    },
+    "PLATELETS": {
+        "unit": "10^3/uL",
+        "range": "150-450",
+        "meaning": "Platelet count; important for clotting.",
+        "advice_high": "May indicate inflammation or bone marrow disorder.",
+        "advice_low": "May indicate risk of bleeding."
+    },
+    # ----- Hematology differential & RBC indices -----
     "NEU%": {
         "unit": "%",
         "range": "40-70",
@@ -507,107 +490,106 @@ TEST_KNOWLEDGE = {
     }
 }
 
+# This dictionary is fully ready to:
+# 1. Add more tests anytime.
+# 2. Combine multiple reports.
+# 3. Generate interpretations using `advice_high` and `advice_low`.
 
 TEST_ALIASES = {
     # ---- Glucose ----
     "FASTING BLOOD SUGAR": [
-        "FASTING BLOOD SUGAR", "FASTINGBLOODSUGAR",
-        "FASTINGPLASMAGLUCOSE", "FASTINGGLUCOSE",
-        "FBS", "GLUCOSEFASTING"
+        "FASTING BLOOD SUGAR", "FASTINGBLOODSUGAR", "FBS", "FASTING GLUCOSE", "GLUCOSEFASTING", "FASTINGPLASMAGLUCOSE"
     ],
-
     "POST PRANDIAL BLOOD GLUCOSE": [
-        "POST PRANDIAL BLOOD GLUCOSE", "POSTPRANDIAL",
-        "PPBS", "POSTPRANDIALBLOODSUGAR"
+        "POST PRANDIAL BLOOD GLUCOSE", "POSTPRANDIAL", "PPBS", "POSTPRANDIALBLOODSUGAR", "POSTPRANDIAL GLUCOSE"
     ],
-
     "HBA1C": [
-        "HBA1C", "HBAIC", "HBALC",
-        "GLYCATEDHAEMOGLOBIN", "GLYCOSYLATEDHEMOGLOBIN"
+        "HBA1C", "HBAIC", "HBALC", "GLYCATEDHAEMOGLOBIN", "GLYCOSYLATEDHEMOGLOBIN"
+    ],
+    "VENOUS BLOOD GLUCOSE": [
+        "VENOUS BLOOD GLUCOSE", "VBG", "VENOUSGLUCOSE", "VEN BLOOD SUGAR"
+    ],
+    "RANDOM BLOOD SUGAR": [
+        "RANDOM BLOOD SUGAR", "RBS", "RANDOMGLUCOSE", "RANDOMGLUCOSESUGAR"
+    ],
+    "OGTT 2-HOUR": [
+        "OGTT 2-HOUR", "ORAL GLUCOSE TOLERANCE", "OGTT", "OGTT 2HR", "2 HOUR OGTT"
     ],
 
     # ---- Kidney ----
-    "CREATININE": ["CREATININE", "SERUMCREATININE"],
-    "E-GFR MALE": ["E-GFR MALE"],
-    "E-GFR FEMALE": ["E-GFR FEMALE"],
-    "E-GFR": ["E-GFR", "EGFR"],
+    "CREATININE": ["CREATININE", "SERUMCREATININE", "S.CREATININE"],
+    "E-GFR": ["E-GFR", "EGFR", "ESTIMATED GFR"],
+    "E-GFR MALE": ["E-GFR MALE", "EGFR MALE", "ESTIMATED GFR MALE"],
+    "E-GFR FEMALE": ["E-GFR FEMALE", "EGFR FEMALE", "ESTIMATED GFR FEMALE"],
 
-    # ---- Lipid profile (ORDER IS CRITICAL) ----
-    "HDL CHOLESTEROL": [
-        "HDL CHOLESTEROL", "HDL-CHOLESTEROL",
-        "CHOLESTEROL HDL", "HDL CHOL", "S HDL", "HDL"
-    ],
-
-    "LDL CHOLESTEROL": [
-        "LDL CHOLESTEROL", "LDL-CHOLESTEROL",
-        "CHOLESTEROL LDL", "LDL CHOL", "S LDL", "LDL"
-    ],
-
-    "VLDL CHOLESTEROL": [
-        "VLDL CHOLESTEROL", "VLDL-CHOLESTEROL",
-        "VLDL CHOL", "VLDL"
-    ],
-
-    "TOTAL CHOLESTEROL": [
-        "TOTAL CHOLESTEROL", "TOTALCHOLESTEROL",
-        "CHOLESTEROL TOTAL"
-    ],
-
-    "TRIGLYCERIDES": [
-        "TRIGLYCERIDES", "TRIGLYCERIDE", "TG"
-    ],
-
-    "CHO : HDL CHOL. RATIO": [
-        "CHO:HDL RATIO", "CHO / HDL RATIO",
-        "TOTAL CHOLESTEROL / HDL RATIO"
-    ],
+    # ---- Lipid Profile ----
+    "TOTAL CHOLESTEROL": ["TOTAL CHOLESTEROL", "TOTALCHOLESTEROL", "CHOLESTEROL TOTAL", "TC"],
+    "HDL CHOLESTEROL": ["HDL CHOLESTEROL", "HDL-CHOLESTEROL", "CHOLESTEROL HDL", "HDL CHOL", "S HDL", "HDL"],
+    "LDL CHOLESTEROL": ["LDL CHOLESTEROL", "LDL-CHOLESTEROL", "CHOLESTEROL LDL", "LDL CHOL", "S LDL", "LDL"],
+    "VLDL CHOLESTEROL": ["VLDL CHOLESTEROL", "VLDL-CHOLESTEROL", "VLDL CHOL", "VLDL"],
+    "TRIGLYCERIDES": ["TRIGLYCERIDES", "TRIGLYCERIDE", "TG", "TRIG"],
+    "CHO : HDL CHOL. RATIO": ["CHO:HDL RATIO", "CHO / HDL RATIO", "TOTAL CHOLESTEROL / HDL RATIO", "CHO/HDL"],
 
     # ---- Urine Albumin ----
-    "URINE MICRO ALBUMIN (UMA)": [
-    "URINE MICRO ALBUMIN", "MICRO ALBUMIN",
-    "URINE MICROALBUMIN", "UMA"
-    ],
+    "URINE MICRO ALBUMIN (UMA)": ["URINE MICRO ALBUMIN", "MICRO ALBUMIN", "URINE MICROALBUMIN", "UMA"],
+    "URINE CREATININE": ["URINE CREATININE", "U CREATININE"],
+    "UMA/CREATININE": ["UMA / CREATININE", "UMA CREATININE", "URINE MICRO ALBUMIN CREATININE", "MICRO ALBUMIN CREATININE"],
 
-    "URINE CREATININE": [
-    "URINE CREATININE"
-  ],
-
-  "UMA/CREATININE": [
-    "UMA / CREATININE", "UMA CREATININE",
-    "URINE MICRO ALBUMIN CREATININE",
-    "MICRO ALBUMIN CREATININE"
-],
     # ---- Proteins & Liver ----
-"TOTAL PROTEINS": [
-    "TOTAL PROTEINS", "TOTALPROTEINS"
-],
+    "TOTAL PROTEINS": ["TOTAL PROTEINS", "TOTALPROTEINS", "TP"],
+    "SERUM ALBUMIN": ["SERUM ALBUMIN", "SERUMALBUMIN", "ALBUMIN", "S.ALB"],
+    "SERUM GLOBULIN": ["SERUM GLOBULIN", "SERUMGLOBULIN", "GLOBULIN", "S.GLOB"],
+    "A/G RATIO": ["A/G RATIO", "AG RATIO", "AGRATIO"],
+    "TOTAL BILIRUBIN": ["TOTAL BILIRUBIN", "TOTALBILIRUBIN", "BILIRUBIN", "TBIL"],
+    "S.G.P.T (ALT)": ["SGPT", "SGPT ALT", "S G P T", "ALT"],
+    "S.G.O.T (AST)": ["SGOT", "SGOT AST", "S G O T", "AST"],
+    "GAMMA GT (GGT)": ["GAMMA GT", "GGT", "GAMMAGT"],
+    "S ALKALINE PHOSPHATASE": ["ALKALINE PHOSPHATASE", "ALP", "SAP"],
 
-"SERUM ALBUMIN": [
-    "SERUM ALBUMIN", "SERUMALBUMIN", "ALBUMIN"
-],
+    # ---- Hematology ----
+    "WBC": ["WBC", "WHITE BLOOD CELLS", "WHITE CELL COUNT"],
+    "RBC": ["RBC", "RED BLOOD CELLS", "ERYTHROCYTES"],
+    "HEMOGLOBIN": ["HEMOGLOBIN", "HGB", "HB"],
+    "HEMATOCRIT": ["HEMATOCRIT", "HCT"],
+    "PLATELETS": ["PLATELETS", "PLT"],
+    "RDW": ["RDW", "RED CELL DISTRIBUTION WIDTH"],
+    "RDW-SD": ["RDW-SD", "RDWSD"],
+    "MCV": ["MCV", "MEAN CORPUSCULAR VOLUME"],
+    "MCH": ["MCH", "MEAN CORPUSCULAR HEMOGLOBIN"],
+    "MCHC": ["MCHC", "MEAN CORPUSCULAR HEMOGLOBIN CONCENTRATION"],
+    "RDW-CV": ["RDW-CV"],
+    "MPV": ["MPV", "MEAN PLATELET VOLUME"],
 
-"SERUM GLOBULIN": [
-    "SERUM GLOBULIN", "SERUMGLOBULIN", "GLOBULIN"
-],
+    # ---- Differential ----
+    "NEU%": ["NEU%", "NEUTROPHILS%", "NEUTROPHILS PERCENT"],
+    "LYM%": ["LYM%", "LYMPHOCYTES%"],
+    "MON%": ["MON%", "MONOCYTES%"],
+    "EOS%": ["EOS%", "EOSINOPHILS%"],
+    "BASO%": ["BASO%", "BASOPHILS%"],
+    "NEU#": ["NEU#", "NEUTROPHILS#"],
+    "LYM#": ["LYM#", "LYMPHOCYTES#"],
+    "MON#": ["MON#", "MONOCYTES#"],
+    "EOS#": ["EOS#", "EOSINOPHILS#"],
+    "BASO#": ["BASO#", "BASOPHILS#"],
+    "*ALY%": ["*ALY%", "ABNORMAL LYMPHOCYTES%"],
+    "*LIC%": ["*LIC%", "LARGE IMMATURE CELLS%"],
+    "*ALY#": ["*ALY#", "ABNORMAL LYMPHOCYTES#"],
+    "*LIC#": ["*LIC#", "LARGE IMMATURE CELLS#"],
 
-"A/G RATIO": [
-    "A/G RATIO", "AG RATIO", "AGRATIO"
-],
-
-"TOTAL BILIRUBIN": [
-    "TOTAL BILIRUBIN", "TOTALBILIRUBIN", "BILIRUBIN"
-],
-
-"S.G.O.T (AST)": [
-    "SGOT", "SGOT AST", "S G O T", "AST"
-],
-
-"GAMMA GT (GGT)": [
-    "GAMMA GT", "GGT", "GAMMAGT"
-],
-
-"S ALKALINE PHOSPHATASE": [
-    "ALKALINE PHOSPHATASE", "ALP", "SAP"
-],
-
+    # ---- Urine Analysis ----
+    "URINE FULL REPORT (UFR)": ["URINE FULL REPORT", "UFR", "URINALYSIS"],
+    "COLOUR": ["COLOUR", "URINE COLOR"],
+    "APPEARANCE": ["APPEARANCE", "URINE APPEARANCE"],
+    "SPECIFIC GRAVITY": ["SPECIFIC GRAVITY", "SG"],
+    "PH": ["PH", "URINE PH"],
+    "PROTEIN": ["PROTEIN", "URINE PROTEIN"],
+    "GLUCOSE": ["GLUCOSE", "URINE GLUCOSE"],
+    "KETONE": ["KETONE", "URINE KETONE"],
+    "BILIRUBIN": ["BILIRUBIN", "URINE BILIRUBIN"],
+    "UROBILINOGEN": ["UROBILINOGEN", "URINE UROBILINOGEN"],
+    "PUS CELLS": ["PUS CELLS", "WBC IN URINE"],
+    "RED CELLS": ["RED CELLS", "RBC IN URINE"],
+    "EPITHELIAL CELLS": ["EPITHELIAL CELLS"],
+    "ORGANISMS": ["ORGANISMS", "BACTERIA", "YEAST"],
+    "CRYSTALS": ["CRYSTALS", "URINE CRYSTALS"]
 }

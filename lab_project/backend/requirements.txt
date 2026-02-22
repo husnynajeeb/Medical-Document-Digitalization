@@ -4,3 +4,4 @@ transformers
 torch
 pytesseract
 Pillow
+python-multipart
