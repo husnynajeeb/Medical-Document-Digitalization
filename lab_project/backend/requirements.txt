@@ -5,3 +5,4 @@ torch
 pytesseract
 Pillow
 python-multipart
+requests

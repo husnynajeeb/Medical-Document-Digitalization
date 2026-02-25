@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.features.extraction_interpretation import ocr_ner
 from app.features.extraction_interpretation.ocr_ner import (
+    extract_tests_with_model,
     ocr_lines,
     extract_tests,
     interpret_tests,
@@ -16,28 +17,22 @@ from app.features.extraction_interpretation.ocr_ner import (
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-
 # Load NER model on startup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     ocr_ner.load_ner_model()
     yield
 
+app = FastAPI(title="Lab Report OCR + Interpretation API", lifespan=lifespan)
 
-app = FastAPI(
-    title="Lab Report OCR + Interpretation API",
-    lifespan=lifespan
-)
-
-# Allow frontend to access backend (CORS)
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # frontend URL
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.post("/upload")
 async def upload_reports(files: List[UploadFile] = File(...)):
@@ -49,25 +44,33 @@ async def upload_reports(files: List[UploadFile] = File(...)):
 
     for file in files:
         file_path = os.path.join(UPLOAD_DIR, file.filename)
-
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         saved_files.append(file.filename)
 
         lines = ocr_lines(file_path)
-        extracted = extract_tests(lines)
-        all_extracted.append(extracted)
+
+        # 1️⃣ NER extraction
+        extracted_ner = extract_tests_with_model(lines)
+
+        # 2️⃣ Strict alias extraction
+        extracted_strict = extract_tests(lines)
+
+        # Merge without duplicates
+        seen_tests = set()
+        combined_extracted = []
+        for e in extracted_ner + extracted_strict:
+            if e['test'] not in seen_tests:
+                combined_extracted.append(e)
+                seen_tests.add(e['test'])
+
+        all_extracted.append(combined_extracted)
 
     interpreted = interpret_tests(all_extracted)
-
-    combined_json = generate_full_combined_interpretation(
-        interpreted,
-        saved_files
-    )
+    combined_json = generate_full_combined_interpretation(interpreted, saved_files)
 
     return combined_json
-
 
 @app.get("/")
 def home():
