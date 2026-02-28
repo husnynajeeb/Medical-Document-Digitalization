@@ -1,4 +1,4 @@
-models/
+
 *.bin
 *.pt
 *.safetensors
@@ -30,5 +30,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ignore large model files
+backend/models/clinicalbert/model.safetensors
+backend/models/clinicalbert/config
+backend/models/clinicalbert/vocab*
+backend/models/clinicalbert/tokenizer*
+backend/models/clinicalbert/training_Args.bin
+backend/models/clinicalbert/config.json
+backend/models/clinicalbert/special_tokens_map.json
 
 
