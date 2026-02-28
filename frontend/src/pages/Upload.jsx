@@ -14,7 +14,7 @@ export default function Upload() {
 
     try {
       setLoading(true);
-      const res = await fetch("http://127.0.0.1:8000/upload", {
+      const res = await fetch("http://127.0.0.1:8000/extraction-interpretation/upload", {
         method: "POST",
         body: form,
       });
@@ -22,8 +22,20 @@ export default function Upload() {
       const data = await res.json();
       console.log("Backend response:", data);
 
-      // Save results in localStorage
-      localStorage.setItem("results", JSON.stringify(data.results || []));
+      // --- Save history correctly ---
+      const prev = localStorage.getItem("all_reports");
+      let history = prev ? JSON.parse(prev) : [];
+
+      // Add new report with timestamp
+      history.push({
+        date: new Date().toISOString(),
+        results: data.results || [],
+        combined_interpretation: data.combined_interpretation || [],
+      });
+
+      localStorage.setItem("all_reports", JSON.stringify(history));
+      // Also keep latest for Results page
+      localStorage.setItem("results", JSON.stringify(data));
 
       // Navigate to results page
       navigate("/results");

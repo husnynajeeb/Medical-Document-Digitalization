@@ -1,40 +1,21 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from typing import List
-import shutil
-import os
-from contextlib import asynccontextmanager
-from fastapi.middleware.cors import CORSMiddleware
+import shutil, os
 
-from app.features.extraction_interpretation import ocr_ner
-from app.features.extraction_interpretation.ocr_ner import (
+from .ocr_ner import (
     extract_tests_with_model,
     ocr_lines,
     extract_tests,
     interpret_tests,
-    generate_full_combined_interpretation,
+    generate_full_combined_interpretation
 )
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# Load NER model on startup
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    ocr_ner.load_ner_model()
-    yield
+router = APIRouter()
 
-app = FastAPI(title="Lab Report OCR + Interpretation API", lifespan=lifespan)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.post("/upload")
+@router.post("/upload")
 async def upload_reports(files: List[UploadFile] = File(...)):
     if not files:
         raise HTTPException(status_code=400, detail="No files uploaded")
@@ -48,11 +29,13 @@ async def upload_reports(files: List[UploadFile] = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         saved_files.append(file.filename)
-
         lines = ocr_lines(file_path)
 
         # 1️⃣ NER extraction
-        extracted_ner = extract_tests_with_model(lines)
+        try:
+            extracted_ner = extract_tests_with_model(lines)
+        except RuntimeError:
+            extracted_ner = []
 
         # 2️⃣ Strict alias extraction
         extracted_strict = extract_tests(lines)
@@ -71,7 +54,3 @@ async def upload_reports(files: List[UploadFile] = File(...)):
     combined_json = generate_full_combined_interpretation(interpreted, saved_files)
 
     return combined_json
-
-@app.get("/")
-def home():
-    return {"message": "API running"}
