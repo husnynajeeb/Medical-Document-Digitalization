@@ -1,31 +1,26 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { jsPDF } from "jspdf";
 
 export default function Results() {
   const [results, setResults] = useState([]);
   const [combined, setCombined] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Load results safely from localStorage
+  // Load results safely from location.state
   useEffect(() => {
-    const data = localStorage.getItem("results");
-    if (!data) {
-      navigate("/upload");
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(data);
-      setTimeout(() => {
-        setResults(parsed.results || []);
-        setCombined(parsed.combined_interpretation || []);
-      }, 0);
-    } catch (err) {
-      console.error("Failed to parse results:", err);
+    if (location.state && location.state.results) {
+      // Wrap in a microtask to avoid synchronous setState warning
+      Promise.resolve().then(() => {
+        setResults(location.state.results);
+        setCombined(location.state.combined_interpretation || []);
+      });
+    } else {
+      // Navigate outside setState to prevent cascading render
       navigate("/upload");
     }
-  }, [navigate]);
+  }, [location.state, navigate]);
 
   if ((!results || results.length === 0) && (!combined || combined.length === 0)) {
     return (
@@ -35,7 +30,6 @@ export default function Results() {
     );
   }
 
-  // Helper function for wrapped text in PDF
   const drawWrappedText = (doc, text, x, y, maxWidth, lineHeight = 6) => {
     const lines = doc.splitTextToSize(text, maxWidth);
     lines.forEach((line) => {
@@ -45,7 +39,6 @@ export default function Results() {
     return y;
   };
 
-  // PDF generation
   const downloadPDF = () => {
     const doc = new jsPDF();
     let y = 20;
@@ -55,10 +48,8 @@ export default function Results() {
     doc.text("Medical Report Analysis", 105, y, { align: "center" });
     y += 12;
 
-    // Single Results
     results.forEach((test) => {
       y += 6;
-
       doc.setFontSize(16);
       doc.setTextColor("#111827");
       doc.text(`${test.test} (${test.unit})`, 14, y);
@@ -95,10 +86,8 @@ export default function Results() {
       }
     });
 
-    // Combined Interpretation
     combined.forEach((block) => {
       y += 10;
-
       doc.setFontSize(16);
       doc.setTextColor("#1E40AF");
       doc.text("Combined Interpretation", 14, y);
@@ -150,7 +139,6 @@ export default function Results() {
   return (
     <div className="flex min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl w-full space-y-6 mx-auto">
-        {/* Single Results */}
         {results.map((test, i) => (
           <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="p-8 border-b border-gray-100 flex justify-between items-center">
@@ -166,7 +154,7 @@ export default function Results() {
                   className={`w-2.5 h-2.5 rounded-full ${
                     test.status === "High" ? "bg-red-600" : "bg-green-600"
                   }`}
-                ></span>
+                />
                 <span>{test.status}</span>
               </span>
             </div>
@@ -187,13 +175,11 @@ export default function Results() {
           </div>
         ))}
 
-        {/* Combined Interpretation */}
         {combined.length > 0 && (
           <div className="bg-white rounded-2xl shadow-xl p-8">
             {combined.map((block, idx) => (
               <div key={idx} className="space-y-4">
                 <h2 className="text-2xl font-bold text-blue-700 mb-4">Combined Interpretation</h2>
-
                 {block.results.map((test, i) => (
                   <div key={i} className="p-4 border rounded-xl border-gray-200">
                     <div className="flex justify-between items-center mb-1">
@@ -211,7 +197,6 @@ export default function Results() {
                     <p className="text-gray-500 text-sm">Value: {test.value}</p>
                   </div>
                 ))}
-
                 <h3 className="text-lg font-bold mt-4 text-gray-800">Overall Interpretation</h3>
                 <p className="text-gray-600">{block.interpretation}</p>
               </div>

@@ -1,18 +1,58 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Results from "./pages/Results";
 import History from "./pages/History";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/upload" element={<Layout><Upload /></Layout>} />
-        <Route path="/results" element={<Layout><Results /></Layout>} />
-        <Route path="/history" element={<Layout><History /></Layout>} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout><Dashboard /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <Layout><Upload /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/results"
+          element={
+            <ProtectedRoute>
+              <Layout><Results /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <Layout><History /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );
