@@ -4,9 +4,8 @@ from contextlib import asynccontextmanager
 
 from routes.auth_routes import router as auth_router
 from app.features.extraction_interpretation.router import router as ei_router
-from app.features.extraction_interpretation import ocr_ner
-
-
+from app.features.diabetes_risk_recommendation.router import router as dr_router  # NEW
+# Load NER model on startup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
@@ -32,6 +31,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(ei_router, prefix="/extraction-interpretation")
+app.include_router(dr_router, prefix="/diabetes")  # NEW
 
 
 @app.get("/")

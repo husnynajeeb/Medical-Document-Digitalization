@@ -6,9 +6,9 @@ pytesseract
 Pillow
 python-multipart
 requests
-motor
-bcrypt
-python-jose[cryptography]
-email-validator
-python-dotenv
-python-multipart
+numpy
+pandas
+scikit-learn
+joblib
+xgboost
+gunicorn

@@ -1,0 +1,2 @@
+MONGO_URL=mongodb+srv://husnynajeeb_db_user:guIc0ZlfWJ9vHJi9@medical-document-digita.td4uomo.mongodb.net/lab_report_app?retryWrites=true&w=majority
+SECRET_KEY=8f92ksldkfj29skd92ksldkfj29skdjf

@@ -1,0 +1,378 @@
+# backend/utils.py
+"""
+Utility functions for diabetes risk assessment with XGBoost model
+"""
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import warnings
+warnings.filterwarnings('ignore')
+
+# ============================================================================
+# FEATURE ENGINEERING FOR XGBOOST MODEL (26 FEATURES)
+# ============================================================================
+
+def calculate_risk_scores(data):
+    """
+    Calculate comprehensive risk scores for diabetes complications
+    """
+    scores = {}
+    
+    # 1. Glucose Risk Score (based on HbA1c and blood glucose)
+    if data['HbA1c_level'] < 5.7:
+        glucose_score = 0
+    elif data['HbA1c_level'] < 6.5:
+        glucose_score = 2
+    else:
+        glucose_score = 4
+    
+    if data['blood_glucose_level'] > 140:
+        glucose_score += 2
+    if data['blood_glucose_level'] > 200:
+        glucose_score += 2
+    
+    scores['glucose_risk'] = min(glucose_score, 5)
+    
+    # 2. BMI Risk Score
+    if data['bmi'] < 18.5:
+        bmi_score = 1
+    elif data['bmi'] < 25:
+        bmi_score = 0
+    elif data['bmi'] < 30:
+        bmi_score = 1
+    elif data['bmi'] < 35:
+        bmi_score = 2
+    else:
+        bmi_score = 3
+    
+    scores['bmi_risk'] = bmi_score
+    
+    # 3. Hypoglycemia Risk Score
+    hypo_score = 0
+    if data['blood_glucose_level'] < 70:
+        hypo_score += 3
+    elif data['blood_glucose_level'] < 90:
+        hypo_score += 1
+    scores['hypoglycemia_risk_score'] = hypo_score
+    
+    # 4. Hyperglycemia Risk Score
+    hyper_score = 0
+    if data['blood_glucose_level'] > 180:
+        hyper_score += 3
+    elif data['blood_glucose_level'] > 140:
+        hyper_score += 1
+    scores['hyperglycemia_risk_score'] = hyper_score
+    
+    # 5. Prediabetes Risk Score
+    prediabetes_score = 0
+    if 5.7 <= data['HbA1c_level'] < 6.5:
+        prediabetes_score += 2
+    if 100 <= data['blood_glucose_level'] < 126:
+        prediabetes_score += 1
+    scores['prediabetes_risk_score'] = prediabetes_score
+    
+    # 6. Cardiovascular Risk Score
+    cardio_score = data['hypertension'] * 2 + data['heart_disease'] * 3
+    if data['age'] > 60:
+        cardio_score += 2
+    elif data['age'] > 45:
+        cardio_score += 1
+    if data['smoking_history'] in ['current', 'former']:
+        cardio_score += 1
+    scores['cardiovascular_risk_score'] = min(cardio_score, 5)
+    
+    # 7. Kidney Risk Score
+    kidney_score = 0
+    if data['age'] > 60:
+        kidney_score += 1
+    if data['hypertension']:
+        kidney_score += 2
+    if data['HbA1c_level'] > 8:
+        kidney_score += 1
+    scores['kidney_risk_score'] = min(kidney_score, 4)
+    
+    # 8. Eye Risk Score
+    eye_score = 0
+    if data['HbA1c_level'] > 7:
+        eye_score += 2
+    if data['age'] > 50:
+        eye_score += 1
+    scores['eye_risk_score'] = min(eye_score, 3)
+    
+    # 9. Neuropathy Risk Score
+    neuro_score = 0
+    if data['age'] > 50:
+        neuro_score += 1
+    if data['HbA1c_level'] > 7.5:
+        neuro_score += 2
+    scores['neuropathy_risk_score'] = min(neuro_score, 3)
+    
+    # 10. Stroke Risk Score
+    stroke_score = data['hypertension'] * 3 + data['heart_disease'] * 2
+    if data['age'] > 65:
+        stroke_score += 2
+    scores['stroke_risk_score'] = min(stroke_score, 5)
+    
+    # 11. Oral Health Risk Score
+    oral_score = 0
+    if data['HbA1c_level'] > 7:
+        oral_score += 1
+    scores['oral_risk_score'] = min(oral_score, 2)
+    
+    # 12. Glycemic Control Risk Score
+    glycemic_score = 0
+    if data['HbA1c_level'] > 9:
+        glycemic_score = 4
+    elif data['HbA1c_level'] > 8:
+        glycemic_score = 3
+    elif data['HbA1c_level'] > 7:
+        glycemic_score = 2
+    elif data['HbA1c_level'] > 6.5:
+        glycemic_score = 1
+    scores['glycemic_risk_score'] = glycemic_score
+    
+    # 13. Total Risk Score
+    total_score = sum([
+        scores['glucose_risk'],
+        scores['bmi_risk'],
+        scores['hypoglycemia_risk_score'],
+        scores['hyperglycemia_risk_score'],
+        scores['prediabetes_risk_score'],
+        scores['cardiovascular_risk_score'],
+        scores['kidney_risk_score'],
+        scores['eye_risk_score'],
+        scores['neuropathy_risk_score'],
+        scores['stroke_risk_score'],
+        scores['oral_risk_score'],
+        scores['glycemic_risk_score']
+    ])
+    scores['total_risk_score'] = min(total_score, 30)
+    
+    return scores
+
+def prepare_features_for_model(data):
+    """
+    Prepare features for XGBoost model with all 26 features
+    """
+    # Calculate all risk scores
+    risk_scores = calculate_risk_scores(data)
+    
+    # Create base features DataFrame
+    features = {
+        'age': [float(data['age'])],
+        'hypertension': [int(data['hypertension'])],
+        'heart_disease': [int(data['heart_disease'])],
+        'bmi': [float(data['bmi'])],
+        'HbA1c_level': [float(data['HbA1c_level'])],
+        'blood_glucose_level': [int(data['blood_glucose_level'])],
+    }
+    
+    # Add calculated risk scores
+    features.update(risk_scores)
+    
+    # Convert to DataFrame
+    features_df = pd.DataFrame(features)
+    
+    # One-hot encode categorical variables
+    # Gender encoding
+    features_df['gender_Male'] = 1 if data['gender'].lower() == 'male' else 0
+    features_df['gender_Other'] = 1 if data['gender'].lower() not in ['male', 'female'] else 0
+    
+    # Smoking history encoding
+    smoking_categories = [
+        'smoking_history_current',
+        'smoking_history_ever',
+        'smoking_history_former',
+        'smoking_history_never',
+        'smoking_history_not current'
+    ]
+    
+    for category in smoking_categories:
+        features_df[category] = 0
+    
+    # Map the smoking history
+    smoking_map = {
+        'never': 'smoking_history_never',
+        'current': 'smoking_history_current',
+        'former': 'smoking_history_former',
+        'ever': 'smoking_history_ever',
+        'not current': 'smoking_history_not current',
+        'no info': 'smoking_history_never'  # Default to never
+    }
+    
+    smoking_key = data['smoking_history'].lower()
+    if smoking_key in smoking_map:
+        features_df[smoking_map[smoking_key]] = 1
+    else:
+        features_df['smoking_history_never'] = 1
+    
+    return features_df
+
+def align_features_with_model(features_df, expected_features):
+    """
+    Align features with model's expected features
+    """
+    # Create a DataFrame with all expected features
+    aligned_df = pd.DataFrame(columns=expected_features)
+    
+    # Fill in available features
+    for feature in expected_features:
+        if feature in features_df.columns:
+            aligned_df[feature] = features_df[feature]
+        else:
+            # Fill missing features with 0 (for one-hot encoded) or mean (for numerical)
+            if any(x in feature for x in ['gender_', 'smoking_history_', '_encoded']):
+                aligned_df[feature] = 0  # One-hot encoded features
+            else:
+                # For numerical features, use 0 as default
+                aligned_df[feature] = 0
+    
+    return aligned_df
+
+def get_risk_assessment(data):
+    """
+    Generate comprehensive risk assessment
+    """
+    # Calculate all risk scores
+    risk_scores = calculate_risk_scores(data)
+    
+    # Overall risk score (sum of all scores)
+    overall_score = risk_scores['total_risk_score']
+    
+    # Determine overall risk level
+    if overall_score >= 20:
+        overall_risk = "Very High"
+        urgency = "Immediate attention required"
+    elif overall_score >= 15:
+        overall_risk = "High"
+        urgency = "Consult a healthcare professional soon"
+    elif overall_score >= 10:
+        overall_risk = "Moderate"
+        urgency = "Monitor closely and consider lifestyle changes"
+    elif overall_score >= 5:
+        overall_risk = "Low"
+        urgency = "Continue healthy habits"
+    else:
+        overall_risk = "Very Low"
+        urgency = "Maintain current healthy lifestyle"
+    
+    # Count risk categories
+    risk_counts = {
+        "high": sum(1 for key, value in risk_scores.items() 
+                   if 'risk' in key.lower() and value >= 3),
+        "moderate": sum(1 for key, value in risk_scores.items() 
+                       if 'risk' in key.lower() and 1 <= value < 3),
+        "low": sum(1 for key, value in risk_scores.items() 
+                  if 'risk' in key.lower() and value == 0)
+    }
+    
+    # Create risk breakdown
+    risk_breakdown = []
+    for risk_type, score in risk_scores.items():
+        if 'risk' in risk_type.lower():
+            if score >= 3:
+                level = "High"
+            elif score >= 1:
+                level = "Moderate"
+            else:
+                level = "Low"
+            
+            # Format the risk type name
+            risk_name = risk_type.replace('_risk_score', '').replace('_', ' ').title()
+            risk_name = risk_name.replace('Hba1c', 'HbA1c').replace('Bmi', 'BMI')
+            
+            risk_breakdown.append({
+                "type": risk_name,
+                "level": level,
+                "score": int(score)
+            })
+    
+    return {
+        "overall_risk": overall_risk,
+        "overall_score": int(overall_score),
+        "risk_counts": risk_counts,
+        "risk_breakdown": risk_breakdown,
+        "urgency": urgency,
+        "timestamp": datetime.now()
+    }
+
+def generate_personalized_recommendations(risk_assessment, age=None, bmi=None, gender=None):
+    """
+    Generate personalized recommendations based on risk assessment
+    """
+    recommendations = []
+    
+    # Overall risk recommendations
+    overall_risk = risk_assessment['overall_risk']
+    overall_score = risk_assessment['overall_score']
+    
+    if overall_risk in ["Very High", "High"]:
+        recommendations.extend([
+            "Schedule an appointment with an endocrinologist or diabetes specialist immediately",
+            "Start blood glucose monitoring at least 3 times daily",
+            "Consider medication review with your healthcare provider",
+            "Attend a diabetes education program"
+        ])
+    elif overall_risk == "Moderate":
+        recommendations.extend([
+            "Consult with a primary care physician within the next month",
+            "Begin regular blood glucose monitoring (fasting and post-meal)",
+            "Join a diabetes prevention program",
+            "Schedule an eye exam to check for diabetic retinopathy"
+        ])
+    
+    # Age-specific recommendations
+    if age:
+        if age > 60:
+            recommendations.extend([
+                "Get a comprehensive geriatric assessment",
+                "Check for medication interactions regularly",
+                "Consider vaccination updates (flu, pneumonia)"
+            ])
+        elif age > 40:
+            recommendations.extend([
+                "Get annual comprehensive metabolic panel",
+                "Consider cardiac stress testing if indicated"
+            ])
+    
+    # BMI-specific recommendations
+    if bmi:
+        if bmi >= 30:
+            recommendations.extend([
+                "Work with a dietitian to develop a sustainable weight loss plan",
+                "Consider weight management medications if appropriate",
+                "Aim for 5-10% weight loss initially"
+            ])
+        elif bmi >= 25:
+            recommendations.extend([
+                "Focus on portion control and balanced meals",
+                "Incorporate 150 minutes of moderate exercise weekly",
+                "Reduce processed food and sugar intake"
+            ])
+    
+    # Gender-specific recommendations
+    if gender:
+        if gender.lower() == 'female':
+            recommendations.extend([
+                "Discuss pregnancy planning if applicable",
+                "Consider PCOS screening if having irregular periods",
+                "Be aware of increased UTI risk with diabetes"
+            ])
+    
+    # Always include these general recommendations
+    general_recommendations = [
+        "Maintain HbA1c below 7% (individualized based on your health status)",
+        "Check blood pressure regularly (target < 130/80 mmHg)",
+        "Get annual comprehensive foot exam",
+        "Have kidney function checked annually (urine microalbumin)",
+        "Get dental checkups every 6 months",
+        "Stay hydrated and limit alcohol consumption",
+        "Manage stress through mindfulness, yoga, or meditation",
+        "Get 7-8 hours of quality sleep nightly",
+        "Quit smoking and avoid secondhand smoke",
+        "Build a support system with family, friends, or support groups"
+    ]
+    
+    recommendations.extend(general_recommendations)
+    
+    return recommendations
