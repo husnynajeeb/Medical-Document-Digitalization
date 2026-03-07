@@ -6,3 +6,9 @@ pytesseract
 Pillow
 python-multipart
 requests
+numpy
+pandas
+scikit-learn
+joblib
+xgboost
+gunicorn
