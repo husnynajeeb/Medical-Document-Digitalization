@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-
+from app.features.extraction_interpretation import ocr_ner
 from routes.auth_routes import router as auth_router
 from app.features.extraction_interpretation.router import router as ei_router
 from app.features.diabetes_risk_recommendation.router import router as dr_router  # NEW
