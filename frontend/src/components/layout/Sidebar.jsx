@@ -1,8 +1,9 @@
-import { Link, useLocation } from "react-router-dom";
-import { Home, FileText, BarChart3, Activity } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Home, FileText, BarChart3, Activity, LogOut } from "lucide-react";
 
 export default function Sidebar() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const linkStyle = (path) =>
     `flex items-center space-x-3 px-4 py-3 rounded-xl mb-2 font-medium transition-all duration-200 group ${
@@ -16,29 +17,31 @@ export default function Sidebar() {
       ? "text-blue-600"
       : "text-gray-400 group-hover:text-blue-500";
 
-  return (
-    <div className="w-72 bg-blue-50 border border-gray-200 rounded-r-2xl shadow-lg flex flex-col">
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
-      {/* ===== LOGO ===== */}
+  return (
+    <aside className="w-72 bg-blue-50 border border-gray-200 rounded-r-2xl shadow-lg flex flex-col min-h-screen">
+
+      {/* TOP SECTION */}
       <div>
+        {/* LOGO */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-md ring-2 ring-blue-100">
               <Activity className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-800">
-                Medical Analyzer
-              </h1>
-              <p className="text-xs text-gray-600">
-                AI-Powered Document Insights
-              </p>
+              <h1 className="text-lg font-bold text-gray-800">Medical Analyzer</h1>
+              <p className="text-xs text-gray-600">AI-Powered Document Insights</p>
             </div>
           </div>
         </div>
 
-        {/* ===== NAVIGATION ===== */}
-        <nav className="p-4 mt-4">
+        {/* NAVIGATION */}
+        <nav className="p-4 mt-4 flex flex-col">
           <Link to="/" className={linkStyle("/")}>
             <Home size={20} className={iconStyle("/")} />
             <span>Dashboard</span>
@@ -60,6 +63,17 @@ export default function Sidebar() {
           </Link>
         </nav>
       </div>
-    </div>
+
+      {/* BOTTOM SECTION */}
+      <div className="mt-auto p-4 border-t border-gray-200">
+        <button
+          onClick={logout}
+          className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-xl transition"
+        >
+          <LogOut size={18} />
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
   );
 }

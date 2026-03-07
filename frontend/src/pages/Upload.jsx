@@ -9,36 +9,45 @@ export default function Upload() {
   const upload = async () => {
     if (!files.length) return alert("Please select a report");
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     const form = new FormData();
     files.forEach((f) => form.append("files", f));
 
     try {
       setLoading(true);
-      const res = await fetch("http://127.0.0.1:8000/extraction-interpretation/upload", {
-        method: "POST",
-        body: form,
-      });
+
+      const res = await fetch(
+        "http://127.0.0.1:8000/extraction-interpretation/upload",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: form,
+        }
+      );
+
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+        return;
+      }
 
       const data = await res.json();
-      console.log("Backend response:", data);
 
-      // --- Save history correctly ---
-      const prev = localStorage.getItem("all_reports");
-      let history = prev ? JSON.parse(prev) : [];
+      if (!res.ok) {
+        alert(data.detail || "Upload failed");
+        return;
+      }
 
-      // Add new report with timestamp
-      history.push({
-        date: new Date().toISOString(),
-        results: data.results || [],
-        combined_interpretation: data.combined_interpretation || [],
-      });
+      // Pass result to Results page
+      navigate("/results", { state: data });
 
-      localStorage.setItem("all_reports", JSON.stringify(history));
-      // Also keep latest for Results page
-      localStorage.setItem("results", JSON.stringify(data));
-
-      // Navigate to results page
-      navigate("/results");
     } catch (err) {
       console.error("Upload error:", err);
       alert("Upload failed. See console for details.");
