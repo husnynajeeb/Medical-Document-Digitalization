@@ -1,7 +1,9 @@
 ✅ README.md
+
 # 🧪 Diabetes Lab Report Extraction and Interpretation Service
 
 ## 📌 Introduction
+
 Laboratory reports related to diabetes monitoring often contain complex
 medical terminology, numerical values, reference ranges, and units that
 are difficult for patients to understand without professional guidance.
@@ -16,6 +18,7 @@ clinical language model, and rule-based medical interpretation.
 ---
 
 ## 🎯 Objectives
+
 - Extract text from diabetes lab report images
 - Identify medical test names, values, reference ranges, and units
 - Interpret results as low, normal, or high
@@ -24,6 +27,7 @@ clinical language model, and rule-based medical interpretation.
 ---
 
 ## 🧠 System Overview
+
 The backend service performs the following steps:
 
 1. Extracts text from lab report images using **Tesseract OCR**
@@ -35,7 +39,6 @@ The backend service performs the following steps:
 
 ## 🏗 Architecture
 
-
 backend/
 └── app/
 ├── main.py # FastAPI application entry point
@@ -43,12 +46,12 @@ backend/
 ├── config.py # Medical knowledge base and test aliases
 └── models/ # Pretrained models (ignored in Git)
 
-
 ---
 
 ## 🚀 Running the Application
 
 ### 1️⃣ Install dependencies
+
 ```bash
 pip install -r requirements.txt
 
@@ -87,3 +90,4 @@ HuggingFace Transformers
 Fine-tuned ClinicalBERT
 Python
 Rule-based medical interpretation
+```

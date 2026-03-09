@@ -12,3 +12,6 @@ scikit-learn
 joblib
 xgboost
 gunicorn
+tensorflow
+scikit-image
+opencv-python-headless
