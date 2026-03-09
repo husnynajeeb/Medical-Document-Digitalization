@@ -1,0 +1,197 @@
+/* ===============================
+   GLOBAL
+================================ */
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===============================
+   MAIN CONTAINER
+================================ */
+
+.container {
+  max-width: 950px;
+  margin: 40px auto;
+  padding: 25px;
+}
+
+.title {
+  text-align: center;
+  color: #0f4c81;
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 35px;
+}
+
+/* ===============================
+   CONTROLS
+================================ */
+
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.dropdown {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+/* ===============================
+   TEXT INPUT
+================================ */
+
+.text-input-container {
+  margin-bottom: 20px;
+}
+
+.input-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.text-input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 180px;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #0f4c81;
+  box-shadow: 0 0 0 2px rgba(15, 76, 129, 0.1);
+}
+
+/* ===============================
+   GENERATE BUTTON
+================================ */
+
+.generate-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.generate-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+/* ===============================
+   OUTPUT CARD
+================================ */
+
+.output-card {
+  margin-top: 30px;
+  background: white;
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+/* Section header */
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.output-header h3 {
+  color: #0f4c81;
+  margin: 0;
+}
+
+/* Section block */
+
+.section-block {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+/* Bullet list */
+
+.section-block ul {
+  margin-top: 8px;
+  padding-left: 18px;
+}
+
+.section-block li {
+  margin-bottom: 6px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* ===============================
+   VOICE BUTTON
+================================ */
+
+.voice-btn {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.voice-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* ===============================
+   TOGGLE
+================================ */
+
+.mode-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 600px) {
+
+  .container {
+    margin: 20px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+}

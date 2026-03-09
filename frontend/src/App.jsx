@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import "./styles/app.css";
 
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
@@ -9,6 +10,7 @@ import History from "./pages/History";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Enhancement from "./pages/EnhancementPage/index";
+import TranslatorPage from "./pages/TranslatorPage"
 
 export default function App() {
   return (
@@ -62,6 +64,15 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+        <Route
+          path="/translator"
+          element={
+            <ProtectedRoute>
+              <Layout><TranslatorPage /></Layout>
+            </ProtectedRoute>
+          }
+        />
 
       </Routes>
     </BrowserRouter>
