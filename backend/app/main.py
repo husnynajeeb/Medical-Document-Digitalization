@@ -4,7 +4,9 @@ from contextlib import asynccontextmanager
 from app.features.extraction_interpretation import ocr_ner
 from routes.auth_routes import router as auth_router
 from app.features.extraction_interpretation.router import router as ei_router
-from app.features.diabetes_risk_recommendation.router import router as dr_router  # NEW
+from app.features.diabetes_risk_recommendation.router import router as dr_router
+from routes.enhancement import router as im_router
+from routes.enhancement import load_enhancer as load_enhancer_model# NEW
 # Load NER model on startup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -13,6 +15,13 @@ async def lifespan(app: FastAPI):
         print("NER model loaded successfully")
     except Exception as e:
         print(f"NER load warning: {e}")
+
+    try:
+        load_enhancer_model()
+        print("Enhancer model loaded successfully")
+    except Exception as e:
+        print(f"Enhancer load warning: {e}")
+
     yield
 
 
@@ -31,7 +40,8 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(ei_router, prefix="/extraction-interpretation")
-app.include_router(dr_router, prefix="/diabetes")  # NEW
+app.include_router(dr_router, prefix="/diabetes")
+app.include_router(im_router, prefix="/enhancement")  # NEW
 
 
 @app.get("/")

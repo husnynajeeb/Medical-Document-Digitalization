@@ -1,0 +1,131 @@
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.upload-zone {
+  position: relative;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px dashed rgba(124, 58, 237, 0.4);
+  border-radius: var(--border-radius);
+  padding: 3.5rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  outline: none;
+  user-select: none;
+}
+
+.upload-zone:hover,
+.upload-zone:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 24px rgba(124, 58, 237, 0.25);
+}
+
+.upload-zone--dragging {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, 0.08);
+  transform: scale(1.01);
+  box-shadow: 0 0 40px rgba(37, 99, 235, 0.3);
+  animation: bounce-drag 0.4s ease-out;
+}
+
+@keyframes bounce-drag {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.02); }
+  70% { transform: scale(0.995); }
+  100% { transform: scale(1.01); }
+}
+
+.upload-input {
+  display: none;
+}
+
+.upload-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(124, 58, 237, 0.5));
+  transition: transform 0.2s ease;
+}
+
+.upload-zone--dragging .upload-icon {
+  transform: scale(1.15);
+}
+
+.upload-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.upload-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Actions bar */
+.upload-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.upload-count {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.btn-enhance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--accent-gradient);
+  color: #0000ff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);
+}
+
+.btn-enhance:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 6px 28px rgba(124, 58, 237, 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-enhance:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-enhance--loading,
+.btn-enhance:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

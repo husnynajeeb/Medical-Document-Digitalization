@@ -1,0 +1,106 @@
+.slider-container {
+  position: relative;
+  width: 100%;
+  user-select: none;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: col-resize;
+  background: #000;
+  aspect-ratio: 4 / 3;
+}
+
+.slider-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: auto;
+}
+
+.slider-img--original {
+  z-index: 1;
+}
+
+.slider-img--enhanced {
+  z-index: 2;
+  transition: clip-path 0.05s linear;
+}
+
+/* Labels */
+.slider-label {
+  position: absolute;
+  top: 0.6rem;
+  z-index: 5;
+  padding: 0.25rem 0.65rem;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  pointer-events: none;
+}
+
+.slider-label--left {
+  left: 0.75rem;
+}
+
+.slider-label--right {
+  right: 0.75rem;
+}
+
+/* Divider */
+.slider-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #fff;
+  z-index: 10;
+  transform: translateX(-50%);
+  cursor: col-resize;
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.slider-divider--dragging {
+  background: #a78bfa;
+  box-shadow: 0 0 16px rgba(124, 58, 237, 0.8);
+}
+
+/* Handle circle */
+.slider-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 42px;
+  height: 42px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  cursor: col-resize;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.slider-divider--dragging .slider-handle {
+  background: #a78bfa;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.7);
+}
+
+.slider-arrow {
+  font-size: 1.1rem;
+  color: #1e1b4b;
+  line-height: 1;
+}
+
+.slider-divider--dragging .slider-arrow {
+  color: #fff;
+}
