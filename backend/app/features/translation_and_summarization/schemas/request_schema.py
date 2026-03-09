@@ -11,3 +11,4 @@ class TranslateRequest(BaseModel):
 class TTSRequest(BaseModel):
     text: str
     target_lang: str
+    

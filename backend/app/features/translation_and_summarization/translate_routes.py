@@ -1,33 +1,23 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
-from schemas.request_schema import TranslateRequest, TTSRequest
-
-from pipelines.translation_pipeline import translate_text
-from pipelines.summarization_pipeline import summarize_text
-from pipelines.tts_pipeline import generate_tts
-
-from utils.section_parser import structure_text
-from utils.text_normalizer import normalize_text
-
-app = FastAPI(title="Medical Translation & Clinical Summarization API")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+from app.features.translation_and_summarization.schemas.request_schema import (
+    TranslateRequest,
+    TTSRequest
 )
 
+from app.features.translation_and_summarization.pipelines.translation_pipeline import translate_text
+from app.features.translation_and_summarization.pipelines.summarization_pipeline import summarize_text
+from app.features.translation_and_summarization.pipelines.tts_pipeline import generate_tts
 
-@app.get("/")
-def root():
-    return {"status": "Medical Translation API running"}
+from app.features.translation_and_summarization.utils.section_parser import structure_text
+from app.features.translation_and_summarization.utils.text_normalizer import normalize_text
 
 
-@app.post("/translate")
+router = APIRouter()
+
+
+@router.post("/translate")
 def translate_endpoint(req: TranslateRequest):
 
     text = normalize_text(req.text)
@@ -63,7 +53,7 @@ def translate_endpoint(req: TranslateRequest):
     return {"translated_output": translated_sections}
 
 
-@app.post("/tts")
+@router.post("/tts")
 def text_to_speech(req: TTSRequest):
 
     if not req.text.strip():

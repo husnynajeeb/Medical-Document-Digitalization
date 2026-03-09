@@ -1,11 +1,10 @@
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 import torch
-from config import DEVICE, T5_MODEL_PATH
+from app.features.translation_and_summarization.config import DEVICE, T5_MODEL_PATH
 
-print("Loading Clinical T5 Model...")
-
-t5_tokenizer = T5Tokenizer.from_pretrained(T5_MODEL_PATH)
-t5_model = T5ForConditionalGeneration.from_pretrained(T5_MODEL_PATH).to(DEVICE)
+print("Loading T5 Model...")
+t5_tokenizer = T5Tokenizer.from_pretrained(T5_MODEL_PATH, local_files_only=True)
+t5_model = T5ForConditionalGeneration.from_pretrained(T5_MODEL_PATH, local_files_only=True).to(DEVICE)
 t5_model.eval()
 
 

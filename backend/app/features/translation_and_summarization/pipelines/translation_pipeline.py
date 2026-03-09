@@ -2,22 +2,22 @@ from transformers import MarianMTModel, MarianTokenizer
 import torch
 import re
 
-from config import DEVICE, SI_MODEL_PATH, TA_MODEL_PATH
-from utils.sentence_splitter import split_sentences
-from dictionaries.medical_dictionary import MEDICAL_TERM_MAP
+from app.features.translation_and_summarization.config import DEVICE, SI_MODEL_PATH, TA_MODEL_PATH
+from app.features.translation_and_summarization.utils.sentence_splitter import split_sentences
+from app.features.translation_and_summarization.dictionaries.medical_dictionary import MEDICAL_TERM_MAP
 
 
 # ---------------------------------------------------
 # Load Models
 # ---------------------------------------------------
 print("Loading Sinhala Translation Model...")
-si_tokenizer = MarianTokenizer.from_pretrained(SI_MODEL_PATH)
-si_model = MarianMTModel.from_pretrained(SI_MODEL_PATH).to(DEVICE)
+si_tokenizer = MarianTokenizer.from_pretrained(SI_MODEL_PATH, local_files_only=True)
+si_model = MarianMTModel.from_pretrained(SI_MODEL_PATH, local_files_only=True).to(DEVICE)
 si_model.eval()
 
 print("Loading Tamil Translation Model...")
-ta_tokenizer = MarianTokenizer.from_pretrained(TA_MODEL_PATH)
-ta_model = MarianMTModel.from_pretrained(TA_MODEL_PATH).to(DEVICE)
+ta_tokenizer = MarianTokenizer.from_pretrained(TA_MODEL_PATH, local_files_only=True)
+ta_model = MarianMTModel.from_pretrained(TA_MODEL_PATH, local_files_only=True).to(DEVICE)
 ta_model.eval()
 
 
