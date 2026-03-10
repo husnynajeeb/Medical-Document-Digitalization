@@ -39,8 +39,9 @@ backend/models/clinicalbert/tokenizer*
 backend/models/clinicalbert/training_Args.bin
 backend/models/clinicalbert/config.json
 backend/models/clinicalbert/special_tokens_map.json
-backend/models/clinicalT5/clinical_t5_finetuned
-backend/models/MarianMT/en_si_finetuned_new
-backend/models/MarianMT/en_ta_finetuned_new
 
 
+# Ignore specific ML model folders
+backend/models/clinicalT5/clinical_t5_finetuned/
+backend/models/MarianMT/en_si_finetuned_new/
+backend/models/MarianMT/en_ta_finetuned_new/
