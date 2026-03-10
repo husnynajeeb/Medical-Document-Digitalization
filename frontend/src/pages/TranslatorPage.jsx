@@ -5,6 +5,7 @@ import GenerateButton from "../components/GenerateButton";
 import ModeToggle from "../components/ModeToggle";
 import LanguageSelector from "../components/LanguageSelector";
 import { translateText } from "../services/api";
+import "../styles/app.css";
 
 function TranslatorPage() {
 
@@ -47,7 +48,7 @@ function TranslatorPage() {
     <div className="container">
 
       <h1 className="title">
-        Clinical AI Translator
+        Translation & Summarization
       </h1>
 
       <div className="controls">

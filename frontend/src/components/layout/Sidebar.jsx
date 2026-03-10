@@ -69,6 +69,11 @@ export default function Sidebar() {
             <FileText size={18} className={iconStyle("/history")} />
             <span>Interpretation History</span>
           </Link>
+
+          <Link to="/translator" className={linkStyle("/translator")}>
+            <FileText size={18} className={iconStyle("/translator")} />
+            <span>Translation & Summarization</span>
+          </Link>
         </nav>
       </div>
 
