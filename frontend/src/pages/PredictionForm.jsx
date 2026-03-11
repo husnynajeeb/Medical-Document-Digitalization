@@ -191,11 +191,11 @@ export default function PredictionForm() {
 
   return (
     // ✅ centered page wrapper like the reference screenshot
-    <Box sx={{ width: "100%", display: "flex", justifyContent: "center", py: 2 }}>
+    <Box sx={{ width: 1200,height: 1300, display: "flex", justifyContent: "center", py: 2 }}>
       <Paper
         elevation={0}
         sx={{
-          width: "100%",
+          width: 800,
           borderRadius: 4,
           border: "1px solid #e5e7eb",
           p: { xs: 2, sm: 3 },
@@ -567,9 +567,9 @@ export default function PredictionForm() {
                 </CardContent>
               </Card>
             </Grid>
-
+            
             {/* Buttons */}
-            <Grid item xs={12}>
+            <Grid item xs={12} width={700}>
               <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 2, flexWrap: "wrap" }}>
                 <Button
                   type="submit"
@@ -582,7 +582,7 @@ export default function PredictionForm() {
                   {loading ? "Processing..." : "Assess Risk"}
                 </Button>
 
-                <Button type="button" variant="outlined" size="large" onClick={handleReset} startIcon={<RestartAltIcon />} sx={{ minWidth: 200 }}>
+                <Button type="button" variant="outlined"  size="large" onClick={handleReset} startIcon={<RestartAltIcon />} sx={{ minWidth: 200 }}>
                   Reset Form
                 </Button>
               </Box>
