@@ -8,6 +8,8 @@ import Results from "./pages/Results";
 import History from "./pages/History";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Prediction from "./pages/PredictionForm"
+import Risk from "./pages/Risk_Results"
 import Enhancement from "./pages/EnhancementPage/index";
 import TranslatorPage from "./pages/TranslatorPage"
 
@@ -69,6 +71,24 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Layout><TranslatorPage /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
+       <Route
+          path="/prediction"
+          element={
+            <ProtectedRoute>
+              <Layout><Prediction /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/risk"
+          element={
+            <ProtectedRoute>
+              <Layout><Risk /></Layout>
             </ProtectedRoute>
           }
         />

@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
-from typing import Optional, List
 from datetime import datetime
 import time
+from pathlib import Path
+
+from utils.dependencies import get_current_user  # same as extraction router
 
 from .utils import (
     get_risk_assessment,
@@ -11,7 +13,6 @@ from .utils import (
     align_features_with_model,
 )
 from .model_loader import safe_load_xgboost_model
-from pathlib import Path
 
 router = APIRouter(tags=["Diabetes Risk (XGBoost)"])
 
@@ -44,16 +45,21 @@ class PatientData(BaseModel):
     smoking_history: str = Field("never")
 
 @router.get("/health")
-def health():
+def health(current_user: dict = Depends(get_current_user)):
+    # If user is not logged in, get_current_user should raise HTTPException (401)
     return {
         "status": "healthy" if model is not None else "degraded",
         "timestamp": datetime.now(),
         "model_loaded": model is not None,
         "model_features": len(EXPECTED_FEATURES),
+        "user_id": str(current_user.get("_id", "")),
     }
 
 @router.post("/predict")
-def predict(data: PatientData):
+def predict(
+    data: PatientData,
+    current_user: dict = Depends(get_current_user),
+):
     start = time.time()
     patient_dict = data.model_dump()
 
@@ -88,6 +94,7 @@ def predict(data: PatientData):
     )[:40]
 
     return {
+        "user_id": str(current_user.get("_id", "")),
         "diabetes_probability": round(probability, 4),
         "diabetes_prediction": prediction,
         "risk_assessment": {
