@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
+  Container,
   Typography,
   Grid,
   Card,
@@ -470,58 +471,64 @@ const Results = () => {
         </Grid>
       </TabPanel>
 
-      {/* Visualizations Tab */}
-      <TabPanel value={tabValue} index={3}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom align="center">
-                  Risk Distribution
-                </Typography>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </Grid>
+    {/* Visualizations Tab */}
+<TabPanel value={tabValue} index={3}>
+  <Container maxWidth="false"> {/* Controls the overall container width */}
+    <Grid container spacing={3}>
+      {/* Full-width Pie Chart */}
+      <Grid item xs={12} md={12}> {/* Fixed: was md={20}, now md={12} */}
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom align="center">
+              Risk Distribution
+            </Typography>
+            <ResponsiveContainer width={600} height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
+                  outerRadius={100} 
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom align="center">
-                  Risk Levels by Category
-                </Typography>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={pieData}>
-                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="value" fill="#1976d2" name="Risk Score" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </TabPanel>
+      {/* Half-width Bar Chart */}
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom align="center">
+              Risk Levels by Category
+            </Typography>
+            <ResponsiveContainer width={500} height={300}>
+              <BarChart data={pieData}>
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#1976d2" name="Risk Score" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  </Container>
+</TabPanel>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
         <Button variant="contained" size="large" onClick={() => navigate('/predict')}>
