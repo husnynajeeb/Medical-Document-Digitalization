@@ -77,7 +77,7 @@ export default function Sidebar() {
           </Link>
           <Link to="/risk" className={linkStyle("/risk")}>
             <BarChart3 size={20} className={iconStyle("/risk")} />
-            <span>Risks and Recommendations</span>
+            <span>Risks and Recommendations</span></Link>
           <Link to="/translator" className={linkStyle("/translator")}>
             <FileText size={18} className={iconStyle("/translator")} />
             <span>Translation & Summarization</span>
