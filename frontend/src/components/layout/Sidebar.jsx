@@ -61,6 +61,16 @@ export default function Sidebar() {
             <FileText size={18} className={iconStyle("/history")} />
             <span>Interpretation History</span>
           </Link>
+
+          {/* ✅ Added: Prediction */}
+          <Link to="/prediction" className={linkStyle("/prediction")}>
+            <FileText size={20} className={iconStyle("/prediction")} />
+            <span>Diabetes Prediction</span>
+          </Link>
+          <Link to="/risk" className={linkStyle("/risk")}>
+            <BarChart3 size={20} className={iconStyle("/risk")} />
+            <span>Risks and Recommendations</span>
+          </Link>
         </nav>
       </div>
 

@@ -12,3 +12,8 @@ scikit-learn
 joblib
 xgboost
 gunicorn
+motor
+pymongo
+python-jose[cryptography]
+pydantic[email]
+

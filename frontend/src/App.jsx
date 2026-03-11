@@ -8,6 +8,8 @@ import Results from "./pages/Results";
 import History from "./pages/History";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Prediction from "./pages/PredictionForm"
+import Risk from "./pages/Risk_Results"
 
 export default function App() {
   return (
@@ -49,6 +51,24 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Layout><History /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
+       <Route
+          path="/prediction"
+          element={
+            <ProtectedRoute>
+              <Layout><Prediction /></Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/risk"
+          element={
+            <ProtectedRoute>
+              <Layout><Risk /></Layout>
             </ProtectedRoute>
           }
         />
