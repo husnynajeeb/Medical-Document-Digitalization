@@ -41,3 +41,7 @@ backend/models/clinicalbert/config.json
 backend/models/clinicalbert/special_tokens_map.json
 
 
+# Ignore specific ML model folders
+backend/models/clinicalT5/clinical_t5_finetuned/
+backend/models/MarianMT/en_si_finetuned_new/
+backend/models/MarianMT/en_ta_finetuned_new/

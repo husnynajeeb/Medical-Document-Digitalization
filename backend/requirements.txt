@@ -17,3 +17,6 @@ pymongo
 python-jose[cryptography]
 pydantic[email]
 
+tensorflow
+scikit-image
+opencv-python-headless

@@ -82,3 +82,15 @@ async def get_my_reports(current_user: dict = Depends(get_current_user)):
         r["user_id"] = str(r["user_id"])  # Convert user_id to string
         reports.append(r)
     return reports
+
+@router.get("/latest-report-public")
+async def get_latest_report_public():
+    report = await reports_collection.find_one(sort=[("created_at", -1)])
+
+    if not report:
+        return {}
+
+    report["_id"] = str(report["_id"])
+    report["user_id"] = str(report["user_id"])
+
+    return report

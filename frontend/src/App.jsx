@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Prediction from "./pages/PredictionForm"
 import Risk from "./pages/Risk_Results"
+import Enhancement from "./pages/EnhancementPage/index";
+import TranslatorPage from "./pages/TranslatorPage"
 
 export default function App() {
   return (
@@ -46,11 +48,29 @@ export default function App() {
           }
         />
 
+          <Route
+            path="/history"
+            element={
+              <ProtectedRoute>
+                <Layout><History /></Layout>
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/enhancement"
+            element={
+              <ProtectedRoute>
+                <Layout><Enhancement /></Layout>
+              </ProtectedRoute>
+            }
+          />
+
         <Route
-          path="/history"
+          path="/translator"
           element={
             <ProtectedRoute>
-              <Layout><History /></Layout>
+              <Layout><TranslatorPage /></Layout>
             </ProtectedRoute>
           }
         />

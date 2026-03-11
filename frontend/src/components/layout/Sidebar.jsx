@@ -24,7 +24,6 @@ export default function Sidebar() {
 
   return (
     <aside className="w-72 bg-blue-50 border border-gray-200 rounded-r-2xl shadow-lg flex flex-col min-h-screen">
-
       {/* TOP SECTION */}
       <div>
         {/* LOGO */}
@@ -34,8 +33,12 @@ export default function Sidebar() {
               <Activity className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-800">Medical Analyzer</h1>
-              <p className="text-xs text-gray-600">AI-Powered Document Insights</p>
+              <h1 className="text-lg font-bold text-gray-800">
+                Medical Analyzer
+              </h1>
+              <p className="text-xs text-gray-600">
+                AI-Powered Document Insights
+              </p>
             </div>
           </div>
         </div>
@@ -45,6 +48,11 @@ export default function Sidebar() {
           <Link to="/" className={linkStyle("/")}>
             <Home size={20} className={iconStyle("/")} />
             <span>Dashboard</span>
+          </Link>
+
+          <Link to="/enhancement" className={linkStyle("/enhancement")}>
+            <FileText size={20} className={iconStyle("/enhancement")} />
+            <span>AI Powered Image Enhancement</span>
           </Link>
 
           <Link to="/upload" className={linkStyle("/upload")}>
@@ -70,6 +78,9 @@ export default function Sidebar() {
           <Link to="/risk" className={linkStyle("/risk")}>
             <BarChart3 size={20} className={iconStyle("/risk")} />
             <span>Risks and Recommendations</span>
+          <Link to="/translator" className={linkStyle("/translator")}>
+            <FileText size={18} className={iconStyle("/translator")} />
+            <span>Translation & Summarization</span>
           </Link>
         </nav>
       </div>

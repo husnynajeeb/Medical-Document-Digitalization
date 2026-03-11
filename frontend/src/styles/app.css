@@ -1,0 +1,247 @@
+/* ===============================
+   GLOBAL
+================================ */
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===============================
+   MAIN CONTAINER
+================================ */
+
+.container {
+  max-width: 950px;
+  margin: 0px auto 40px auto;
+  padding: 25px;
+}
+
+.title {
+  text-align: center;
+  color: #0f4c81;
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* ===============================
+   CONTROLS
+================================ */
+
+.controls {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+/* ===============================
+   LANGUAGE SELECTOR
+================================ */
+
+.dropdown {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 140px;
+  appearance: none; /* removes default arrow in some browsers */
+}
+
+.dropdown:hover {
+  border-color: #646cffaa;
+  box-shadow: 0 0 6px rgba(100, 108, 255, 0.2);
+}
+
+.dropdown:focus {
+  outline: none;
+  border-color: #646cffaa;
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+}
+
+/* Optional: style individual options */
+.dropdown_opn {
+  padding: 8px;
+  background: white;
+  color: #374151;
+}
+
+/* ===============================
+   TEXT INPUT
+================================ */
+
+.text-input-container {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.text-input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 180px;
+  transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #646cffaa;
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.1);
+}
+
+/* ===============================
+   GENERATE BUTTON
+================================ */
+
+.generate-btn,
+button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #646cffaa, #1e40af);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.generate-btn:hover,
+button:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+/* ===============================
+   OUTPUT CARD
+================================ */
+
+.output-card {
+  margin-top: 30px;
+  background: white;
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  text-align: left;
+}
+
+/* Section header */
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.output-header h3 {
+  color: #646cffaa;
+  margin: 0;
+}
+
+/* Section block */
+
+.section-block {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+/* Bullet list and text */
+
+.section-block ul {
+  margin-top: 8px;
+  padding-left: 18px;
+}
+
+.section-block li,
+.section-text {
+  margin-bottom: 6px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* ===============================
+   VOICE BUTTON
+================================ */
+
+.voice-btn {
+  padding: 4px 6px;
+  width: 100px;
+  background: linear-gradient(135deg, #646cffaa, #1e40af);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.voice-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+/* ===============================
+   TOGGLE
+================================ */
+
+.mode-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #646cffaa;
+  cursor: pointer;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 600px) {
+
+  .container {
+    margin: 20px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .generate-btn,
+  button {
+    width: 100%;
+  }
+
+}
