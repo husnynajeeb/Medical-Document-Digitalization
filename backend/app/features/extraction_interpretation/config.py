@@ -6,6 +6,9 @@ MODEL_PATH = os.path.abspath(
     os.path.join(BASE_DIR, "../../../models/clinicalbert")
 )
 
+
+OCR_API_URL = "https://ocr-service-production-0408.up.railway.app/ocr"
+
 TEST_KNOWLEDGE = {
     # ----- Glucose -----
     "FASTING BLOOD SUGAR": {
