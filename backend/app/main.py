@@ -5,7 +5,7 @@ from app.features.extraction_interpretation import ocr_ner
 from routes.auth_routes import router as auth_router
 from app.features.extraction_interpretation.router import router as ei_router
 from app.features.diabetes_risk_recommendation.router import router as dr_router  # NEW
-# from app.features.translation_and_summarization.translate_routes import router as translation_router
+from app.features.translation_and_summarization.translate_routes import router as translation_router
 from app.features.diabetes_risk_recommendation.router import router as dr_router
 from routes.enhancement import router as im_router
 from routes.enhancement import load_enhancer as load_enhancer_model# NEW
@@ -42,8 +42,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(ei_router, prefix="/extraction-interpretation")
-app.include_router(dr_router, prefix="/diabetes")  # NEW
-# app.include_router(translation_router, prefix="/translation")
+app.include_router(dr_router, prefix="/diabetes")  # NEW app.include_router(translation_router, prefix="/translation")
 app.include_router(dr_router, prefix="/diabetes")
 app.include_router(im_router, prefix="/enhancement")  # NEW
 
