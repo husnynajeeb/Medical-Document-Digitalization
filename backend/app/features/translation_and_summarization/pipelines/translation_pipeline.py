@@ -1,22 +1,81 @@
-from transformers import MarianMTModel, MarianTokenizer
-import torch
+import os
 import re
 from typing import Dict, List
-import os
+
+import torch
+from transformers import MarianMTModel, MarianTokenizer
+
 from app.features.translation_and_summarization.config import DEVICE, SI_MODEL_PATH, TA_MODEL_PATH
 
-# YOUR EXACT WORKING MODEL LOADING
-print("Loading Sinhala Translation Model...")
-si_tokenizer = MarianTokenizer.from_pretrained(SI_MODEL_PATH)
-si_model = MarianMTModel.from_pretrained(SI_MODEL_PATH).to(DEVICE)
-si_model.eval()
+try:
+    from huggingface_hub import snapshot_download
 
-print("Loading Tamil Translation Model...")
-ta_tokenizer = MarianTokenizer.from_pretrained(TA_MODEL_PATH)
-ta_model = MarianMTModel.from_pretrained(TA_MODEL_PATH).to(DEVICE)
-ta_model.eval()
+    HF_HUB_AVAILABLE = True
+except ImportError:
+    HF_HUB_AVAILABLE = False
 
-print("✅ Translation models loaded successfully!")
+si_tokenizer = None
+si_model = None
+ta_tokenizer = None
+ta_model = None
+
+
+def _resolve_model_dir(model_path: str, repo_env: str, subdir_env: str) -> str:
+    if os.path.isdir(model_path):
+        return model_path
+
+    if not HF_HUB_AVAILABLE:
+        print("Translation model not found locally and huggingface_hub is missing")
+        return model_path
+
+    repo_id = os.getenv(repo_env)
+    subdir = os.getenv(subdir_env)
+    if not repo_id:
+        print(f"Translation model not found locally. Set {repo_env} to download.")
+        return model_path
+
+    cache_dir = os.getenv("HF_CACHE_DIR")
+    allow_patterns = None
+    if subdir:
+        allow_patterns = f"{subdir}/*"
+
+    snapshot_path = snapshot_download(
+        repo_id=repo_id,
+        cache_dir=cache_dir,
+        allow_patterns=allow_patterns,
+    )
+
+    if subdir:
+        return os.path.join(snapshot_path, subdir)
+    return snapshot_path
+
+
+def _ensure_translation_models_loaded() -> None:
+    global si_tokenizer, si_model, ta_tokenizer, ta_model
+
+    if si_tokenizer is None or si_model is None:
+        print("Loading Sinhala Translation Model...")
+        si_dir = _resolve_model_dir(
+            SI_MODEL_PATH, "HF_SI_MODEL_REPO", "HF_SI_MODEL_SUBDIR"
+        )
+        if os.path.isdir(si_dir):
+            si_tokenizer = MarianTokenizer.from_pretrained(si_dir)
+            si_model = MarianMTModel.from_pretrained(si_dir).to(DEVICE)
+            si_model.eval()
+        else:
+            print("Sinhala translation model not available")
+
+    if ta_tokenizer is None or ta_model is None:
+        print("Loading Tamil Translation Model...")
+        ta_dir = _resolve_model_dir(
+            TA_MODEL_PATH, "HF_TA_MODEL_REPO", "HF_TA_MODEL_SUBDIR"
+        )
+        if os.path.isdir(ta_dir):
+            ta_tokenizer = MarianTokenizer.from_pretrained(ta_dir)
+            ta_model = MarianMTModel.from_pretrained(ta_dir).to(DEVICE)
+            ta_model.eval()
+        else:
+            print("Tamil translation model not available")
 
 # ---------------------------------------------------
 # YOUR EXACT WORKING UTILITY FUNCTIONS
@@ -28,9 +87,14 @@ def split_sentences(text: str) -> List[str]:
 
 def get_translation_model(target_lang: str):
     """Your exact model getter"""
+    _ensure_translation_models_loaded()
     if target_lang == "si":
+        if si_tokenizer is None or si_model is None:
+            raise ValueError("Sinhala translation model is not available")
         return si_tokenizer, si_model
     if target_lang == "ta":
+        if ta_tokenizer is None or ta_model is None:
+            raise ValueError("Tamil translation model is not available")
         return ta_tokenizer, ta_model
     raise ValueError(f"Unsupported language: {target_lang}")
 
