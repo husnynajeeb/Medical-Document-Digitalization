@@ -46,7 +46,8 @@ import axios from "axios";
  * - Navigate: "/risk"
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 const initialFormData = {
   age: 45,
@@ -62,19 +63,23 @@ const initialFormData = {
 // Health status indicators
 const getHealthStatus = (value, type) => {
   if (type === "bmi") {
-    if (value < 18.5) return { label: "Underweight", color: "#2196f3", emoji: "⚖️" };
+    if (value < 18.5)
+      return { label: "Underweight", color: "#2196f3", emoji: "⚖️" };
     if (value < 25) return { label: "Normal", color: "#4caf50", emoji: "✅" };
-    if (value < 30) return { label: "Overweight", color: "#ff9800", emoji: "⚠️" };
+    if (value < 30)
+      return { label: "Overweight", color: "#ff9800", emoji: "⚠️" };
     return { label: "Obese", color: "#f44336", emoji: "🔴" };
   }
   if (type === "hba1c") {
     if (value < 5.7) return { label: "Normal", color: "#4caf50", emoji: "✅" };
-    if (value < 6.5) return { label: "Prediabetes", color: "#ff9800", emoji: "⚠️" };
+    if (value < 6.5)
+      return { label: "Prediabetes", color: "#ff9800", emoji: "⚠️" };
     return { label: "Diabetes", color: "#f44336", emoji: "🔴" };
   }
   if (type === "glucose") {
     if (value < 100) return { label: "Normal", color: "#4caf50", emoji: "✅" };
-    if (value < 126) return { label: "Prediabetes", color: "#ff9800", emoji: "⚠️" };
+    if (value < 126)
+      return { label: "Prediabetes", color: "#ff9800", emoji: "⚠️" };
     return { label: "Diabetes", color: "#f44336", emoji: "🔴" };
   }
   return null;
@@ -151,20 +156,24 @@ export default function PredictionForm() {
         smoking_history: formData.smoking_history,
       };
 
-      const response = await axios.post(`${API_BASE_URL}/diabetes/predict`, apiData, {
-        timeout: 10000,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        `${API_BASE_URL}/diabetes/predict`,
+        apiData,
+        {
+          timeout: 10000,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       sessionStorage.setItem(
         "predictionResults",
         JSON.stringify({
           ...response.data,
           patientData: apiData,
-        })
+        }),
       );
 
       navigate("/risk");
@@ -178,9 +187,13 @@ export default function PredictionForm() {
       }
 
       if (err.code === "ERR_NETWORK") {
-        setError("Cannot connect to the server. Please check if the backend is running.");
+        setError(
+          "Cannot connect to the server. Please check if the backend is running.",
+        );
       } else if (err.response) {
-        setError(err.response.data?.detail || `Server error: ${err.response.status}`);
+        setError(
+          err.response.data?.detail || `Server error: ${err.response.status}`,
+        );
       } else {
         setError(err.message || "An unexpected error occurred");
       }
@@ -191,7 +204,15 @@ export default function PredictionForm() {
 
   return (
     // ✅ centered page wrapper like the reference screenshot
-    <Box sx={{ width: 1200,height: 1300, display: "flex", justifyContent: "center", py: 2 }}>
+    <Box
+      sx={{
+        width: 1200,
+        height: 1300,
+        display: "flex",
+        justifyContent: "center",
+        py: 2,
+      }}
+    >
       <Paper
         elevation={0}
         sx={{
@@ -205,18 +226,28 @@ export default function PredictionForm() {
       >
         {/* Header */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", color: "primary.main" }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ fontWeight: "bold", color: "primary.main" }}
+          >
             🩺 Diabetes Risk Assessment
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
-            Adjust the sliders to input patient information for comprehensive XGBoost-based diabetes risk analysis
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ maxWidth: 600, mx: "auto" }}
+          >
+            Adjust the sliders to input patient information for comprehensive
+            XGBoost-based diabetes risk analysis
           </Typography>
         </Box>
 
         {/* API Status Alert */}
         {apiStatus === "disconnected" && (
           <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
-            ⚠️ Backend server is not connected. Please ensure the server is running at http://localhost:8000
+            ⚠️ Backend server is not connected. Please ensure the server is
+            running at {API_BASE_URL}
           </Alert>
         )}
         {apiStatus === "connected" && (
@@ -227,7 +258,11 @@ export default function PredictionForm() {
 
         {/* Error Alert */}
         {error && (
-          <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setError(null)}>
+          <Alert
+            severity="error"
+            sx={{ mb: 3, borderRadius: 2 }}
+            onClose={() => setError(null)}
+          >
             {error}
           </Alert>
         )}
@@ -246,11 +281,23 @@ export default function PredictionForm() {
                 }}
               >
                 <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mb: 2,
+                    }}
+                  >
                     <Typography variant="h6" color="primary">
                       Age (years)
                     </Typography>
-                    <Chip label={`${formData.age} years`} color="primary" variant="outlined" size="small" />
+                    <Chip
+                      label={`${formData.age} years`}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                    />
                   </Box>
 
                   <Box sx={{ px: 1 }}>
@@ -272,7 +319,14 @@ export default function PredictionForm() {
                     />
                   </Box>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1, px: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 1,
+                      px: 1,
+                    }}
+                  >
                     <Typography variant="caption" color="text.secondary">
                       Young
                     </Typography>
@@ -300,7 +354,13 @@ export default function PredictionForm() {
                   </Typography>
 
                   <FormControl fullWidth sx={{ mt: 2 }}>
-                    <Select name="gender" value={formData.gender} onChange={handleChange} variant="outlined" size="medium">
+                    <Select
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      variant="outlined"
+                      size="medium"
+                    >
                       <MenuItem value="Male">Male</MenuItem>
                       <MenuItem value="Female">Female</MenuItem>
                       <MenuItem value="Other">Other</MenuItem>
@@ -322,7 +382,14 @@ export default function PredictionForm() {
                 }}
               >
                 <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mb: 2,
+                    }}
+                  >
                     <Typography variant="h6" color="primary">
                       Body Mass Index (BMI)
                     </Typography>
@@ -330,9 +397,17 @@ export default function PredictionForm() {
                       <Chip
                         label={getHealthStatus(formData.bmi, "bmi")?.label}
                         size="small"
-                        sx={{ bgcolor: getHealthStatus(formData.bmi, "bmi")?.color, color: "white" }}
+                        sx={{
+                          bgcolor: getHealthStatus(formData.bmi, "bmi")?.color,
+                          color: "white",
+                        }}
                       />
-                      <Chip label={`${formData.bmi}`} color="primary" variant="outlined" size="small" />
+                      <Chip
+                        label={`${formData.bmi}`}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
                     </Box>
                   </Box>
 
@@ -358,10 +433,40 @@ export default function PredictionForm() {
                     />
                   </Box>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-                    <Chip label="Normal" size="small" sx={{ bgcolor: "#4caf50", color: "white", fontSize: "0.7rem" }} />
-                    <Chip label="Prediabetes" size="small" sx={{ bgcolor: "#ff9800", color: "white", fontSize: "0.7rem" }} />
-                    <Chip label="Overweight" size="small" sx={{ bgcolor: "#f44336", color: "white", fontSize: "0.7rem" }} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Chip
+                      label="Normal"
+                      size="small"
+                      sx={{
+                        bgcolor: "#4caf50",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
+                    <Chip
+                      label="Prediabetes"
+                      size="small"
+                      sx={{
+                        bgcolor: "#ff9800",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
+                    <Chip
+                      label="Overweight"
+                      size="small"
+                      sx={{
+                        bgcolor: "#f44336",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
                   </Box>
                 </CardContent>
               </Card>
@@ -378,17 +483,37 @@ export default function PredictionForm() {
                 }}
               >
                 <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mb: 2,
+                    }}
+                  >
                     <Typography variant="h6" color="primary">
                       HbA1c Level (%)
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Chip
-                        label={getHealthStatus(formData.HbA1c_level, "hba1c")?.label}
+                        label={
+                          getHealthStatus(formData.HbA1c_level, "hba1c")?.label
+                        }
                         size="small"
-                        sx={{ bgcolor: getHealthStatus(formData.HbA1c_level, "hba1c")?.color, color: "white" }}
+                        sx={{
+                          bgcolor: getHealthStatus(
+                            formData.HbA1c_level,
+                            "hba1c",
+                          )?.color,
+                          color: "white",
+                        }}
                       />
-                      <Chip label={`${formData.HbA1c_level}%`} color="primary" variant="outlined" size="small" />
+                      <Chip
+                        label={`${formData.HbA1c_level}%`}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
                     </Box>
                   </Box>
 
@@ -411,10 +536,40 @@ export default function PredictionForm() {
                     />
                   </Box>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-                    <Chip label="Normal" size="small" sx={{ bgcolor: "#4caf50", color: "white", fontSize: "0.7rem" }} />
-                    <Chip label="Prediabetes" size="small" sx={{ bgcolor: "#ff9800", color: "white", fontSize: "0.7rem" }} />
-                    <Chip label="Diabetes" size="small" sx={{ bgcolor: "#f44336", color: "white", fontSize: "0.7rem" }} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Chip
+                      label="Normal"
+                      size="small"
+                      sx={{
+                        bgcolor: "#4caf50",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
+                    <Chip
+                      label="Prediabetes"
+                      size="small"
+                      sx={{
+                        bgcolor: "#ff9800",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
+                    <Chip
+                      label="Diabetes"
+                      size="small"
+                      sx={{
+                        bgcolor: "#f44336",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
                   </Box>
                 </CardContent>
               </Card>
@@ -432,17 +587,40 @@ export default function PredictionForm() {
                 }}
               >
                 <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mb: 2,
+                    }}
+                  >
                     <Typography variant="h6" color="primary">
                       Blood Glucose (mg/dL)
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Chip
-                        label={getHealthStatus(formData.blood_glucose_level, "glucose")?.label}
+                        label={
+                          getHealthStatus(
+                            formData.blood_glucose_level,
+                            "glucose",
+                          )?.label
+                        }
                         size="small"
-                        sx={{ bgcolor: getHealthStatus(formData.blood_glucose_level, "glucose")?.color, color: "white" }}
+                        sx={{
+                          bgcolor: getHealthStatus(
+                            formData.blood_glucose_level,
+                            "glucose",
+                          )?.color,
+                          color: "white",
+                        }}
                       />
-                      <Chip label={`${formData.blood_glucose_level}`} color="primary" variant="outlined" size="small" />
+                      <Chip
+                        label={`${formData.blood_glucose_level}`}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
                     </Box>
                   </Box>
 
@@ -465,10 +643,40 @@ export default function PredictionForm() {
                     />
                   </Box>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-                    <Chip label="Normal" size="small" sx={{ bgcolor: "#4caf50", color: "white", fontSize: "0.7rem" }} />
-                    <Chip label="Prediabetes" size="small" sx={{ bgcolor: "#ff9800", color: "white", fontSize: "0.7rem" }} />
-                    <Chip label="Diabetes" size="small" sx={{ bgcolor: "#f44336", color: "white", fontSize: "0.7rem" }} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Chip
+                      label="Normal"
+                      size="small"
+                      sx={{
+                        bgcolor: "#4caf50",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
+                    <Chip
+                      label="Prediabetes"
+                      size="small"
+                      sx={{
+                        bgcolor: "#ff9800",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
+                    <Chip
+                      label="Diabetes"
+                      size="small"
+                      sx={{
+                        bgcolor: "#f44336",
+                        color: "white",
+                        fontSize: "0.7rem",
+                      }}
+                    />
                   </Box>
                 </CardContent>
               </Card>
@@ -489,17 +697,43 @@ export default function PredictionForm() {
                     Hypertension
                   </Typography>
 
-                  <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mt: 2 }}
+                  >
                     <FormControlLabel
-                      control={<Switch name="hypertension" checked={formData.hypertension} onChange={handleChange} color="primary" size="medium" />}
+                      control={
+                        <Switch
+                          name="hypertension"
+                          checked={formData.hypertension}
+                          onChange={handleChange}
+                          color="primary"
+                          size="medium"
+                        />
+                      }
                       label={formData.hypertension ? "Yes" : "No"}
                       labelPlacement="bottom"
                     />
                   </Box>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-                    <Chip label="No" size="small" variant={!formData.hypertension ? "filled" : "outlined"} color={!formData.hypertension ? "success" : "default"} />
-                    <Chip label="Yes" size="small" variant={formData.hypertension ? "filled" : "outlined"} color={formData.hypertension ? "error" : "default"} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Chip
+                      label="No"
+                      size="small"
+                      variant={!formData.hypertension ? "filled" : "outlined"}
+                      color={!formData.hypertension ? "success" : "default"}
+                    />
+                    <Chip
+                      label="Yes"
+                      size="small"
+                      variant={formData.hypertension ? "filled" : "outlined"}
+                      color={formData.hypertension ? "error" : "default"}
+                    />
                   </Box>
                 </CardContent>
               </Card>
@@ -520,17 +754,43 @@ export default function PredictionForm() {
                     Heart Disease
                   </Typography>
 
-                  <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mt: 2 }}
+                  >
                     <FormControlLabel
-                      control={<Switch name="heart_disease" checked={formData.heart_disease} onChange={handleChange} color="primary" size="medium" />}
+                      control={
+                        <Switch
+                          name="heart_disease"
+                          checked={formData.heart_disease}
+                          onChange={handleChange}
+                          color="primary"
+                          size="medium"
+                        />
+                      }
                       label={formData.heart_disease ? "Yes" : "No"}
                       labelPlacement="bottom"
                     />
                   </Box>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-                    <Chip label="No" size="small" variant={!formData.heart_disease ? "filled" : "outlined"} color={!formData.heart_disease ? "success" : "default"} />
-                    <Chip label="Yes" size="small" variant={formData.heart_disease ? "filled" : "outlined"} color={formData.heart_disease ? "error" : "default"} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Chip
+                      label="No"
+                      size="small"
+                      variant={!formData.heart_disease ? "filled" : "outlined"}
+                      color={!formData.heart_disease ? "success" : "default"}
+                    />
+                    <Chip
+                      label="Yes"
+                      size="small"
+                      variant={formData.heart_disease ? "filled" : "outlined"}
+                      color={formData.heart_disease ? "error" : "default"}
+                    />
                   </Box>
                 </CardContent>
               </Card>
@@ -553,36 +813,90 @@ export default function PredictionForm() {
                   </Typography>
 
                   <FormControl fullWidth sx={{ mt: 1 }}>
-                    <Select name="smoking_history" value={formData.smoking_history} onChange={handleChange} variant="outlined">
+                    <Select
+                      name="smoking_history"
+                      value={formData.smoking_history}
+                      onChange={handleChange}
+                      variant="outlined"
+                    >
                       <MenuItem value="never">🚭 Never Smoked</MenuItem>
                       <MenuItem value="former">🚬 Former Smoker</MenuItem>
                       <MenuItem value="current">🔥 Current Smoker</MenuItem>
                     </Select>
                   </FormControl>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-                    <Chip label="No" size="small" variant={formData.smoking_history === "never" ? "filled" : "outlined"} color={formData.smoking_history === "never" ? "success" : "default"} />
-                    <Chip label="Yes" size="small" variant={formData.smoking_history !== "never" ? "filled" : "outlined"} color={formData.smoking_history !== "never" ? "error" : "default"} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 2,
+                    }}
+                  >
+                    <Chip
+                      label="No"
+                      size="small"
+                      variant={
+                        formData.smoking_history === "never"
+                          ? "filled"
+                          : "outlined"
+                      }
+                      color={
+                        formData.smoking_history === "never"
+                          ? "success"
+                          : "default"
+                      }
+                    />
+                    <Chip
+                      label="Yes"
+                      size="small"
+                      variant={
+                        formData.smoking_history !== "never"
+                          ? "filled"
+                          : "outlined"
+                      }
+                      color={
+                        formData.smoking_history !== "never"
+                          ? "error"
+                          : "default"
+                      }
+                    />
                   </Box>
                 </CardContent>
               </Card>
             </Grid>
-            
+
             {/* Buttons */}
             <Grid item xs={12} width={700}>
-              <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 2, flexWrap: "wrap" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: "center",
+                  mt: 2,
+                  flexWrap: "wrap",
+                }}
+              >
                 <Button
                   type="submit"
                   variant="contained"
                   size="large"
                   disabled={loading || apiStatus !== "connected"}
-                  startIcon={loading ? <CircularProgress size={20} /> : <SendIcon />}
+                  startIcon={
+                    loading ? <CircularProgress size={20} /> : <SendIcon />
+                  }
                   sx={{ minWidth: 200 }}
                 >
                   {loading ? "Processing..." : "Assess Risk"}
                 </Button>
 
-                <Button type="button" variant="outlined"  size="large" onClick={handleReset} startIcon={<RestartAltIcon />} sx={{ minWidth: 200 }}>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  size="large"
+                  onClick={handleReset}
+                  startIcon={<RestartAltIcon />}
+                  sx={{ minWidth: 200 }}
+                >
                   Reset Form
                 </Button>
               </Box>
@@ -606,7 +920,10 @@ export default function PredictionForm() {
               <Typography variant="h6">About This Assessment</Typography>
             </Box>
             <Typography variant="body2" color="text.secondary">
-              This tool uses an XGBoost machine learning model trained on 100,000+ patient records to provide accurate diabetes risk predictions. The analysis considers 10 different risk categories including cardiovascular, kidney, eye, and nerve health.
+              This tool uses an XGBoost machine learning model trained on
+              100,000+ patient records to provide accurate diabetes risk
+              predictions. The analysis considers 10 different risk categories
+              including cardiovascular, kidney, eye, and nerve health.
             </Typography>
           </CardContent>
         </Card>

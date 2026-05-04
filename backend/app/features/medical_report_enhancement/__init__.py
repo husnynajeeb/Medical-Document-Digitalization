@@ -5,6 +5,9 @@ U-Net model loader and patch-based inference engine for document
 deblurring and denoising.
 """
 
+import os
+from pathlib import Path
+
 import numpy as np
 
 try:
@@ -13,6 +16,13 @@ try:
     TF_AVAILABLE = True
 except ImportError:
     TF_AVAILABLE = False
+
+try:
+    from huggingface_hub import hf_hub_download
+
+    HF_HUB_AVAILABLE = True
+except ImportError:
+    HF_HUB_AVAILABLE = False
 
 
 class ModelEnhancer:
@@ -24,13 +34,40 @@ class ModelEnhancer:
         self.param_count = 0
         self.patch_size = 128
         self.batch_size = batch_size
-        self._model_path = model_path
+        self._model_path = self._resolve_model_path(model_path)
 
         if not TF_AVAILABLE:
             print("⚠️  TensorFlow not installed — model loading skipped")
             return
 
         self._load_model()
+
+    def _resolve_model_path(self, model_path: str) -> str:
+        """Use local path if present, otherwise download from Hugging Face."""
+        if Path(model_path).is_file():
+            return model_path
+
+        if not HF_HUB_AVAILABLE:
+            print("⚠️  huggingface_hub not installed — skipping model download")
+            return model_path
+
+        repo_id = os.getenv("HF_MODEL_REPO", "husnynajeeb/clinicalbert")
+        filename = os.getenv(
+            "HF_MODEL_FILE", "medical_report_enhancement/best_model.keras"
+        )
+        cache_dir = os.getenv("HF_CACHE_DIR")
+
+        try:
+            downloaded = hf_hub_download(
+                repo_id=repo_id,
+                filename=filename,
+                cache_dir=cache_dir,
+            )
+            print(f"✅ Model downloaded from HF: {repo_id}/{filename}")
+            return downloaded
+        except Exception as e:
+            print(f"⚠️  HF download failed: {e}")
+            return model_path
 
     def _load_model(self) -> None:
         """Load the Keras model from *self._model_path*."""

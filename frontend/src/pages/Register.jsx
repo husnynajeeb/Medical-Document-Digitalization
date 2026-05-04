@@ -2,13 +2,15 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const register = async () => {
-    const res = await fetch("http://127.0.0.1:8000/auth/register", {
+    const res = await fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
@@ -60,7 +62,10 @@ export default function Register() {
         </button>
 
         <p className="mt-4 text-sm text-center">
-          Already have account? <Link to="/login" className="text-blue-600">Login</Link>
+          Already have account?{" "}
+          <Link to="/login" className="text-blue-600">
+            Login
+          </Link>
         </p>
       </div>
     </div>

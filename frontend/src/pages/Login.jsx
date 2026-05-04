@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -11,7 +13,7 @@ export default function Login() {
     formData.append("username", email);
     formData.append("password", password);
 
-    const res = await fetch("http://127.0.0.1:8000/auth/login", {
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: formData,
@@ -65,7 +67,10 @@ export default function Login() {
         </button>
 
         <p className="mt-4 text-sm text-center">
-          No account? <Link to="/register" className="text-blue-600">Register</Link>
+          No account?{" "}
+          <Link to="/register" className="text-blue-600">
+            Register
+          </Link>
         </p>
       </div>
     </div>

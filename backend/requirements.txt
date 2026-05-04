@@ -2,6 +2,7 @@ fastapi
 uvicorn
 transformers
 torch
+huggingface_hub
 pytesseract
 Pillow
 python-multipart
@@ -16,6 +17,7 @@ motor
 pymongo
 python-jose[cryptography]
 pydantic[email]
+gtts
 
 tensorflow
 scikit-image

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Upload() {
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -22,14 +24,14 @@ export default function Upload() {
       setLoading(true);
 
       const res = await fetch(
-        "http://127.0.0.1:8000/extraction-interpretation/upload",
+        `${API_BASE_URL}/extraction-interpretation/upload`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
           body: form,
-        }
+        },
       );
 
       if (res.status === 401) {
@@ -47,7 +49,6 @@ export default function Upload() {
 
       // Pass result to Results page
       navigate("/results", { state: data });
-
     } catch (err) {
       console.error("Upload error:", err);
       alert("Upload failed. See console for details.");

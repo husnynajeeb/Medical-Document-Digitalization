@@ -8,6 +8,8 @@ import { translateText } from "../services/api";
 import "../styles/app.css";
 
 function TranslatorPage() {
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
   const [text, setText] = useState("");
   const [output, setOutput] = useState(null);
   const [summarize, setSummarize] = useState(false);
@@ -19,7 +21,7 @@ function TranslatorPage() {
     const loadLatestInterpretation = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/extraction-interpretation/latest-report-public"
+          `${API_BASE_URL}/extraction-interpretation/latest-report-public`,
         );
 
         console.log("Fetch status:", response.status);
