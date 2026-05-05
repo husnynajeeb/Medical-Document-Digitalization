@@ -10,28 +10,40 @@
  *   <EnhancementPage />
  */
 
+/**
+ * Enhancement Page — IT22348098
+ * --------------------------------
+ * Medical Report Image Enhancement feature page.
+ * Integrated with Multilingual Processing module.
+ */
+
 import { useState, useCallback } from 'react';
 
 import UploadZone from './components/UploadZone.jsx';
 import ImageGallery from './components/ImageGallery.jsx';
 import Lightbox from './components/Lightbox.jsx';
+import MultilingualPanel from '../../components/MultilingualPanel.jsx';
+
 import { enhanceBatch } from './api.js';
 import './EnhancementPage.css';
 
 function EnhancementPage() {
   const [images, setImages] = useState([]);
   const [selectedImageId, setSelectedImageId] = useState(null);
-  const [lightbox, setLightbox] = useState(null); // { url, type, imageId }
+  const [lightbox, setLightbox] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [toast, setToast] = useState(null); // { message, type: 'success'|'error' }
+  const [toast, setToast] = useState(null);
 
-  // ── Toast ───────────────────────────────────────────────────────────────────
+  // 🌍 Language state (for your system consistency)
+  const [language, setLanguage] = useState("en");
+
+  // ── Toast ─────────────────────────────────────────
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   }, []);
 
-  // ── File selection ──────────────────────────────────────────────────────────
+  // ── File selection ────────────────────────────────
   const handleFilesSelected = useCallback((files) => {
     const newImages = files.map((file) => ({
       id: crypto.randomUUID(),
@@ -44,18 +56,22 @@ function EnhancementPage() {
       processingTime: null,
       error: null,
     }));
+
     setImages((prev) => [...prev, ...newImages]);
   }, []);
 
-  // ── Enhance all pending images ──────────────────────────────────────────────
+  // ── Enhance all ───────────────────────────────────
   const handleEnhanceAll = useCallback(async () => {
     const pending = images.filter((img) => img.status === 'pending');
     if (!pending.length) return;
 
     setIsProcessing(true);
+
     setImages((prev) =>
       prev.map((img) =>
-        img.status === 'pending' ? { ...img, status: 'processing' } : img
+        img.status === 'pending'
+          ? { ...img, status: 'processing' }
+          : img
       )
     );
 
@@ -65,11 +81,20 @@ function EnhancementPage() {
 
       setImages((prev) =>
         prev.map((img) => {
-          const result = results.find((r) => r.filename === img.file.name);
+          const result = results.find(
+            (r) => r.filename === img.file.name
+          );
+
           if (!result) return img;
+
           if (result.status === 'error') {
-            return { ...img, status: 'error', error: result.error };
+            return {
+              ...img,
+              status: 'error',
+              error: result.error,
+            };
           }
+
           return {
             ...img,
             status: 'done',
@@ -83,11 +108,14 @@ function EnhancementPage() {
 
       const successCount = results.filter((r) => r.status === 'success').length;
       const errorCount = results.filter((r) => r.status === 'error').length;
-      if (errorCount > 0) {
-        showToast(`Enhanced ${successCount} image(s), ${errorCount} failed.`, 'error');
-      } else {
-        showToast(`Successfully enhanced ${successCount} image(s)! 🎉`, 'success');
-      }
+
+      showToast(
+        errorCount
+          ? `Enhanced ${successCount}, ${errorCount} failed`
+          : `Successfully enhanced ${successCount} images 🎉`,
+        errorCount ? 'error' : 'success'
+      );
+
     } catch (err) {
       setImages((prev) =>
         prev.map((img) =>
@@ -96,13 +124,14 @@ function EnhancementPage() {
             : img
         )
       );
+
       showToast(`Enhancement failed: ${err.message}`, 'error');
     } finally {
       setIsProcessing(false);
     }
   }, [images, showToast]);
 
-  // ── UI handlers ─────────────────────────────────────────────────────────────
+  // ── UI handlers ───────────────────────────────────
   const handleImageClick = useCallback((imageId) => {
     setSelectedImageId(imageId);
   }, []);
@@ -125,11 +154,16 @@ function EnhancementPage() {
       });
   }, [images]);
 
+  // ⭐ IMPORTANT: selected image for multilingual processing
+  const selectedImage = images.find(img => img.id === selectedImageId);
+
   const pendingCount = images.filter((img) => img.status === 'pending').length;
   const doneCount = images.filter((img) => img.status === 'done').length;
 
   return (
     <div className="enhancement-page">
+
+      {/* Upload */}
       <UploadZone
         onFilesSelected={handleFilesSelected}
         onEnhanceAll={handleEnhanceAll}
@@ -137,6 +171,7 @@ function EnhancementPage() {
         pendingCount={pendingCount}
       />
 
+      {/* Gallery */}
       {images.length > 0 && (
         <ImageGallery
           images={images}
@@ -146,9 +181,23 @@ function EnhancementPage() {
           onCloseComparison={handleCloseComparison}
           onDownloadAll={handleDownloadAll}
           doneCount={doneCount}
+          language={language}
         />
       )}
 
+      {/* 🌍 MULTILINGUAL PANEL (NEW 🔥) */}
+      {selectedImage && selectedImage.enhancedUrl && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>🌍 Multilingual Processing for Selected Image</h3>
+
+          <MultilingualPanel
+            inputType="image"
+            imageBase64={selectedImage.enhancedUrl}
+          />
+        </div>
+      )}
+
+      {/* Lightbox */}
       {lightbox && (
         <Lightbox
           images={images}
@@ -158,6 +207,7 @@ function EnhancementPage() {
         />
       )}
 
+      {/* Toast */}
       {toast && (
         <div className={`enhancement-toast enhancement-toast--${toast.type}`}>
           {toast.message}
@@ -168,4 +218,3 @@ function EnhancementPage() {
 }
 
 export default EnhancementPage;
-

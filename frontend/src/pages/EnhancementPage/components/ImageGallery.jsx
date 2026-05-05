@@ -3,14 +3,18 @@ import ComparisonSlider from './ComparisonSlider.jsx';
 import MetricsCard from './MetricsCard.jsx';
 import './ImageGallery.css';
 
-const STATUS_LABELS = {
-  pending: 'Pending',
-  processing: 'Processing…',
-  done: 'Enhanced ✅',
-  error: 'Failed ❌',
-};
+// ✅ multilingual hook
+import { useLanguage } from '../../../services/useLanguage.jsx';
 
-function ImageCard({ image, isSelected, onCardClick, onOpenLightbox, onCloseComparison }) {
+function ImageCard({
+  image,
+  isSelected,
+  onCardClick,
+  onOpenLightbox,
+  onCloseComparison,
+}) {
+  const { t } = useLanguage();
+
   const handleDownload = useCallback(
     (e) => {
       e.stopPropagation();
@@ -24,6 +28,7 @@ function ImageCard({ image, isSelected, onCardClick, onOpenLightbox, onCloseComp
 
   return (
     <div className={`image-card glass${isSelected ? ' image-card--selected' : ''}`}>
+      
       <div className="image-card-thumb" onClick={() => onCardClick(image.id)}>
         <img
           src={image.originalUrl}
@@ -31,8 +36,10 @@ function ImageCard({ image, isSelected, onCardClick, onOpenLightbox, onCloseComp
           className="image-card-img"
           loading="lazy"
         />
+
+        {/* ✅ FIX: multilingual status */}
         <span className={`status-badge status-badge--${image.status}`}>
-          {STATUS_LABELS[image.status] || image.status}
+          {t(`status_${image.status}`) || image.status}
         </span>
       </div>
 
@@ -50,30 +57,35 @@ function ImageCard({ image, isSelected, onCardClick, onOpenLightbox, onCloseComp
         )}
 
         {image.status === 'error' && (
-          <p className="image-card-error">{image.error || 'Unknown error'}</p>
+          <p className="image-card-error">
+            {image.error || t("unknown_error")}
+          </p>
         )}
 
         {image.status === 'done' && image.enhancedUrl && (
           <button className="btn-download" onClick={handleDownload}>
-            ⬇ Download Enhanced
+            {t("download") || "⬇ Download Enhanced"}
           </button>
         )}
       </div>
 
-      {/* Inline comparison slider modal */}
+      {/* comparison slider */}
       {isSelected && image.status === 'done' && (
         <div className="comparison-overlay" onClick={(e) => e.stopPropagation()}>
           <button
             className="comparison-close"
             onClick={onCloseComparison}
-            aria-label="Close comparison"
+            aria-label={t("close")}
           >
             ✕
           </button>
+
           <ComparisonSlider
             originalUrl={image.originalUrl}
             enhancedUrl={image.enhancedUrl}
-            onOpenLightbox={(url, type) => onOpenLightbox(url, type, image.id)}
+            onOpenLightbox={(url, type) =>
+              onOpenLightbox(url, type, image.id)
+            }
           />
         </div>
       )}
@@ -81,6 +93,9 @@ function ImageCard({ image, isSelected, onCardClick, onOpenLightbox, onCloseComp
   );
 }
 
+// ===================================================
+// GALLERY COMPONENT
+// ===================================================
 function ImageGallery({
   images,
   selectedImageId,
@@ -90,16 +105,20 @@ function ImageGallery({
   onDownloadAll,
   doneCount,
 }) {
+  const { t } = useLanguage();
+
   return (
     <section className="gallery-section">
+      
       <div className="gallery-header">
         <h2 className="gallery-title">
-          Images
+          {t("images") || "Images"}
           <span className="gallery-count">{images.length}</span>
         </h2>
+
         {doneCount > 0 && (
           <button className="btn-download-all" onClick={onDownloadAll}>
-            ⬇ Download All Enhanced ({doneCount})
+            {t("download_all")} ({doneCount})
           </button>
         )}
       </div>
@@ -116,6 +135,7 @@ function ImageGallery({
           />
         ))}
       </div>
+
     </section>
   );
 }

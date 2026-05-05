@@ -34,7 +34,7 @@ export async function enhanceImage(file) {
  * @param {File[]} files
  * @returns {Promise<{results: Array, total: number}>}
  */
-export async function enhanceBatch(files) {
+export async function enhanceBatch(files, lang) {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
 

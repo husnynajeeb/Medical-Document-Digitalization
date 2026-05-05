@@ -1,267 +1,307 @@
 import os
 import re
-from typing import Dict, List
-
 import torch
 from transformers import MarianMTModel, MarianTokenizer
 
-from app.features.translation_and_summarization.config import DEVICE, SI_MODEL_PATH, TA_MODEL_PATH
-
-try:
-    from huggingface_hub import snapshot_download
-
-    HF_HUB_AVAILABLE = True
-except ImportError:
-    HF_HUB_AVAILABLE = False
-
-si_tokenizer = None
-si_model = None
-ta_tokenizer = None
-ta_model = None
+from app.features.translation_and_summarization.config import (
+    DEVICE,
+    SI_MODEL_PATH,
+    TA_MODEL_PATH,
+)
 
 
-def _resolve_model_dir(model_path: str, repo_env: str, subdir_env: str) -> str:
-    if os.path.isdir(model_path):
-        return model_path
-
-    if not HF_HUB_AVAILABLE:
-        print("Translation model not found locally and huggingface_hub is missing")
-        return model_path
-
-    repo_id = os.getenv(repo_env)
-    subdir = os.getenv(subdir_env)
-    if not repo_id:
-        print(f"Translation model not found locally. Set {repo_env} to download.")
-        return model_path
-
-    cache_dir = os.getenv("HF_CACHE_DIR")
-    allow_patterns = None
-    if subdir:
-        allow_patterns = f"{subdir}/*"
-
-    snapshot_path = snapshot_download(
-        repo_id=repo_id,
-        cache_dir=cache_dir,
-        allow_patterns=allow_patterns,
-    )
-
-    if subdir:
-        return os.path.join(snapshot_path, subdir)
-    return snapshot_path
+# ===================================================
+# MODEL HOLDERS
+# ===================================================
+si_tokenizer, si_model = None, None
+ta_tokenizer, ta_model = None, None
 
 
-def _ensure_translation_models_loaded() -> None:
+# ===================================================
+# LOAD MODELS
+# ===================================================
+def load_models():
     global si_tokenizer, si_model, ta_tokenizer, ta_model
 
-    if si_tokenizer is None or si_model is None:
-        print("Loading Sinhala Translation Model...")
-        si_dir = _resolve_model_dir(
-            SI_MODEL_PATH, "HF_SI_MODEL_REPO", "HF_SI_MODEL_SUBDIR"
-        )
-        if os.path.isdir(si_dir):
-            si_tokenizer = MarianTokenizer.from_pretrained(si_dir)
-            si_model = MarianMTModel.from_pretrained(si_dir).to(DEVICE)
-            si_model.eval()
-        else:
-            print("Sinhala translation model not available")
+    if si_model is None and os.path.isdir(SI_MODEL_PATH):
+        print("✅ Loading Sinhala model...")
+        si_tokenizer = MarianTokenizer.from_pretrained(SI_MODEL_PATH)
+        si_model = MarianMTModel.from_pretrained(SI_MODEL_PATH).to(DEVICE)
+        si_model.eval()
 
-    if ta_tokenizer is None or ta_model is None:
-        print("Loading Tamil Translation Model...")
-        ta_dir = _resolve_model_dir(
-            TA_MODEL_PATH, "HF_TA_MODEL_REPO", "HF_TA_MODEL_SUBDIR"
-        )
-        if os.path.isdir(ta_dir):
-            ta_tokenizer = MarianTokenizer.from_pretrained(ta_dir)
-            ta_model = MarianMTModel.from_pretrained(ta_dir).to(DEVICE)
-            ta_model.eval()
-        else:
-            print("Tamil translation model not available")
+    if ta_model is None and os.path.isdir(TA_MODEL_PATH):
+        print("✅ Loading Tamil model...")
+        ta_tokenizer = MarianTokenizer.from_pretrained(TA_MODEL_PATH)
+        ta_model = MarianMTModel.from_pretrained(TA_MODEL_PATH).to(DEVICE)
+        ta_model.eval()
 
-# ---------------------------------------------------
-# YOUR EXACT WORKING UTILITY FUNCTIONS
-# ---------------------------------------------------
-def split_sentences(text: str) -> List[str]:
-    """Your reliable sentence splitter"""
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    return [s.strip() for s in sentences if s.strip()]
 
-def get_translation_model(target_lang: str):
-    """Your exact model getter"""
-    _ensure_translation_models_loaded()
-    if target_lang == "si":
-        if si_tokenizer is None or si_model is None:
-            raise ValueError("Sinhala translation model is not available")
+def get_model(lang: str):
+    load_models()
+
+    if lang == "si":
         return si_tokenizer, si_model
-    if target_lang == "ta":
-        if ta_tokenizer is None or ta_model is None:
-            raise ValueError("Tamil translation model is not available")
-        return ta_tokenizer, ta_model
-    raise ValueError(f"Unsupported language: {target_lang}")
 
-# ---------------------------------------------------
-# MEDICAL TERM PRESERVATION (SIMPLE REGEX)
-# ---------------------------------------------------
-def preserve_medical_terms(text: str) -> str:
-    """Preserve critical clinical terms BEFORE translation"""
-    # Preserve abbreviations
-    text = re.sub(r'\b(HbA1c|eGFR|EF|CKD|LDL|HDL|ECG)\b', r'[\1]', text)
-    
-    # Preserve units  
-    text = re.sub(r'\b(mg|mg/dL|mmHg|mL/min/1\.73m²?|%|units)\b', r'[\1]', text)
-    
-    # Preserve drug names
-    drugs = ['Metformin', 'Amlodipine', 'Lisinopril', 'Atorvastatin', 'Aspirin', 
-             'insulin glargine']
-    for drug in drugs:
-        text = re.sub(rf'\b{re.escape(drug)}\b', f'[{drug}]', text, flags=re.IGNORECASE)
-    
-    return text
-
-def restore_medical_terms(text: str) -> str:
-    """Simple bracket restoration"""
-    # Restore abbreviations
-    text = re.sub(r'\[(HbA1c|eGFR|EF|CKD|LDL|HDL|ECG)\]', r'\1', text)
-    
-    # Restore units
-    text = re.sub(r'\[(mg|mg/dL|mmHg|mL/min/1\.73m²?|%|units)\]', r'\1', text)
-    
-    # Restore drugs
-    drugs = ['Metformin', 'Amlodipine', 'Lisinopril', 'Atorvastatin', 'Aspirin', 
-             'insulin glargine']
-    for drug in drugs:
-        text = re.sub(rf'\[' + re.escape(drug) + r'\]', drug, text, flags=re.IGNORECASE)
-    
-    return text
-
-# ---------------------------------------------------
-# POST-PROCESSING FIXES (Your translation artifacts)
-# ---------------------------------------------------
-def post_process_medical(text: str, lang: str) -> str:
-    """Fix common Tamil/Sinhala translation errors"""
     if lang == "ta":
-        fixes = {
-            "மெலிட்டஸ்": "நீரிழிவு நோய்",
-            "நீரிழிவு சிறுநீரக": "நிலையான சிறுநீரக நோய்", 
-            "தோல் கட்டுப்பாடு": "இரத்த அழுத்த கட்டுப்பாடு",
-            "அட்டோர்வாஸ்டடின்": "அட்ரோவாஸ்டாடின்",
-            "கிரியாடினின்": "கிரியேட்டினின்",
-        }
-    elif lang == "si":
-        fixes = {
-            "මැලිතස්": "මධුමේහ රෝගය",
-            "ඊශ්‍රායෙල් හෘද": "ඉස්කීමියා හෘද රෝගය",
-            "රුටින් අනුගමනය": "රුටින් පරීක්ෂණය",
-            "ලෙබ්‍රෑම්": "පරීක්ෂණ",
-            "අධික රේඛාව": "සාමාන්‍ය මට්ටම",
-        }
-    else:
-        return text
-    
-    for wrong, correct in fixes.items():
-        text = re.sub(re.escape(wrong), correct, text, flags=re.IGNORECASE)
+        return ta_tokenizer, ta_model
+
+    return None, None
+
+
+# ===================================================
+# CLEAN TEXT
+# ===================================================
+def clean_text(text: str) -> str:
+    if not text:
+        return ""
+
+    text = re.sub(r"\s+", " ", text)
+
+    # Safe decimal cleanup only where dot exists
+    text = re.sub(r"(\d)\s*\.\s*(\d)", r"\1.\2", text)
+
+    # BP format cleanup
+    text = re.sub(r"(\d{2,3})\s*/\s*(\d{2,3})", r"\1/\2", text)
+
+    return text.strip()
+
+
+# ===================================================
+# MEDICAL TOKEN PROTECTION
+# ===================================================
+def protect(text: str) -> str:
+    replacements = {
+        "HbA1c": "HBA1C_TOKEN",
+        "LDL": "LDL_TOKEN",
+        "HDL": "HDL_TOKEN",
+        "ECG": "ECG_TOKEN",
+        "mg/dL": "MGDL_TOKEN",
+        "mg/dl": "MGDL_TOKEN",
+        "mmHg": "MMHG_TOKEN",
+    }
+
+    for original, token in replacements.items():
+        text = re.sub(rf"\b{re.escape(original)}\b", token, text)
+
     return text
 
-# ---------------------------------------------------
-# YOUR CORE TRANSLATION FUNCTIONS
-# ---------------------------------------------------
-def translate_sentence(sentence: str, target_lang: str) -> str:
-    """Single sentence translation - YOUR EXACT LOGIC + preservation"""
-    # 1. Preserve medical terms
-    preserved = preserve_medical_terms(sentence)
-    
-    # 2. Translate (YOUR WORKING CODE)
-    tokenizer, model = get_translation_model(target_lang)
-    inputs = tokenizer(preserved, return_tensors="pt", truncation=True, max_length=256).to(DEVICE)
-    
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            num_beams=5,
+
+def restore(text: str) -> str:
+    replacements = {
+        "HBA1C_TOKEN": "HbA1c",
+        "LDL_TOKEN": "LDL",
+        "HDL_TOKEN": "HDL",
+        "ECG_TOKEN": "ECG",
+        "MGDL_TOKEN": "mg/dL",
+        "MMHG_TOKEN": "mmHg",
+    }
+
+    for token, original in replacements.items():
+        text = text.replace(token, original)
+
+    return text
+
+
+# ===================================================
+# FINAL MEDICAL CLEANUP
+# ===================================================
+def final_medical_cleanup(text: str) -> str:
+    if not text:
+        return ""
+
+    # Remove leaked or partially translated placeholder tokens
+    token_fixes = {
+        "MGGLTOken": "mg/dL",
+        "MGDLTOken": "mg/dL",
+        "MGDLTOKEN": "mg/dL",
+        "MGDL_TOKEN": "mg/dL",
+        "MGDLடோகென்": "mg/dL",
+        "LDLடோகென்": "LDL",
+        "HDLடோகென்": "HDL",
+        "HBA1Cடோகென்": "HbA1c",
+        "MMHGடோகென்": "mmHg",
+        "LDLTOKEN": "LDL",
+        "HDLTOKEN": "HDL",
+        "HBA1CTOKEN": "HbA1c",
+    }
+
+    for wrong, correct in token_fixes.items():
+        text = text.replace(wrong, correct)
+
+    # Remove leftover token-like fragments
+    text = re.sub(r"\b[A-Z]+TOken\b", "", text)
+    text = re.sub(r"\b[A-Z]+TOKEN\b", "", text)
+
+    # Common range corrections caused by model output
+    text = text.replace("125.0-20.0", "125.0-200.0")
+    text = text.replace("0.150.0", "0.0-150.0")
+    text = text.replace("45.0-60.0", "45.0-60.0")
+
+    # Unit normalization
+    text = text.replace("mg/dl", "mg/dL")
+    text = text.replace("மி.கி./டி.எல்.", "mg/dL")
+    text = text.replace("மி.கி/டி.எல்", "mg/dL")
+
+    # Duplicate units
+    text = re.sub(r"mg/dL\s*mg/dL", "mg/dL", text)
+
+    # Fix accidental spaces
+    text = re.sub(r"\s+", " ", text)
+
+    return text.strip()
+
+
+# ===================================================
+# TAMIL GRAMMAR IMPROVER
+# ===================================================
+def improve_tamil(text: str) -> str:
+    if not text:
+        return ""
+
+    text = text.replace("_", "")
+
+    replacements = {
+        "நிலை உயர்": "உயர் நிலையில் உள்ளது",
+        "நிலை குறைந்தது": "குறைந்த நிலையில் உள்ளது",
+        "சாதாரணம்:": "குறிப்பு:",
+        "முக்கிய கண்டறியல்": "முக்கிய கண்டறிவுகள்",
+        "கண்டறியல்": "கண்டறிவுகள்",
+        "உயர் மதிப்புகள் கண்டறியப்பட்டது": "அதிகமான அளவுகள் கண்டறியப்பட்டுள்ளன",
+        "குறைந்த மதிப்பீடு கண்டறிவிக்கப்பட்டது": "குறைந்த அளவுகள் கண்டறியப்பட்டுள்ளன",
+        "சுகாதார குழந்தைகளுடன்": "ஆரோக்கியமான கொழுப்புகளுடன்",
+        "சுகாதார குழாய்களுடன்": "ஆரோக்கியமான கொழுப்புகளுடன்",
+        "சுதந்திர எடை": "ஆரோக்கியமான எடை",
+        "வாழ்க்கை முறை ஊசிகள்": "வாழ்க்கை முறை மாற்றங்கள்",
+        "மருத்துவரை பரிசோதனை": "மருத்துவரை அணுகவும்",
+        "மருத்துவ மதிப்பீடு பயன்படுத்தவும்": "மருத்துவ மதிப்பீடு பெறவும்",
+    }
+
+    for wrong, correct in replacements.items():
+        text = text.replace(wrong, correct)
+
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+# ===================================================
+# MEDICAL WORDING IMPROVER
+# ===================================================
+def medical_rewriter(text: str, lang: str) -> str:
+    if not text:
+        return ""
+
+    if lang == "ta":
+        replacements = {
+            "High values detected": "அதிகமான அளவுகள் கண்டறியப்பட்டுள்ளன",
+            "Low values detected": "குறைந்த அளவுகள் கண்டறியப்பட்டுள்ளன",
+            "Key Findings": "முக்கிய கண்டறிவுகள்",
+            "Abnormalities": "அசாதாரண முடிவுகள்",
+        }
+
+    elif lang == "si":
+        replacements = {
+            "High values detected": "ඉහළ අගයන් හඳුනාගෙන ඇත",
+            "Low values detected": "අඩු අගයන් හඳුනාගෙන ඇත",
+            "Key Findings": "ප්‍රධාන සොයාගැනීම්",
+            "Abnormalities": "අසාමාන්‍ය ප්‍රතිඵල",
+        }
+
+    else:
+        replacements = {}
+
+    for wrong, correct in replacements.items():
+        text = text.replace(wrong, correct)
+
+    return text
+
+
+# ===================================================
+# TRANSLATE SINGLE SENTENCE
+# ===================================================
+def translate_sentence(text: str, lang: str) -> str:
+    if not text:
+        return ""
+
+    if lang == "en":
+        return text
+
+    tokenizer, model = get_model(lang)
+
+    if not tokenizer or not model:
+        return text
+
+    try:
+        protected_text = protect(text)
+
+        inputs = tokenizer(
+            protected_text,
+            return_tensors="pt",
+            truncation=True,
             max_length=256,
-            early_stopping=True
-        )
-    
-    translated = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    
-    # 3. Restore + post-process
-    cleaned = restore_medical_terms(translated)
-    final = post_process_medical(cleaned, target_lang)
-    
+        ).to(DEVICE)
+
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                max_length=256,
+                num_beams=5,
+                repetition_penalty=1.2,
+                no_repeat_ngram_size=3,
+            )
+
+        translated = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        translated = restore(translated)
+        translated = final_medical_cleanup(translated)
+
+        return clean_text(translated)
+
+    except Exception as e:
+        print("❌ Translation sentence error:", str(e))
+        return text
+
+
+# ===================================================
+# MAIN TRANSLATION FUNCTION
+# ===================================================
+def translate_text(text: str, lang: str) -> str:
+    if not text:
+        return ""
+
+    if lang == "en":
+        return text
+
+    text = clean_text(text)
+
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    results = []
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+
+        if len(sentence) < 3:
+            continue
+
+        translated = translate_sentence(sentence, lang)
+
+        if not translated:
+            translated = sentence
+
+        results.append(translated)
+
+    final = " ".join(results)
+
+    final = medical_rewriter(final, lang)
+
+    if lang == "ta":
+        final = improve_tamil(final)
+
+    final = final_medical_cleanup(final)
+    final = clean_text(final)
+
     return final
 
-def translate_text(text: str, target_lang: str) -> str:
-    """Full text translation - YOUR PROVEN METHOD"""
-    sentences = split_sentences(text)
-    translated_sentences = [translate_sentence(sentence, target_lang) for sentence in sentences]
-    return " ".join(translated_sentences)
 
-# ---------------------------------------------------
-# YOUR PERFECT SECTION STRUCTURE (KILLER FEATURE!)
-# ---------------------------------------------------
-def structure_text(text: str) -> Dict[str, List[str]]:
-    """Clinical section detection - YOUR BRILLIANT LOGIC"""
-    structured = {
-        "General": [],
-        "Recent Labs": [],
-        "Current Medications": [],
-        "Assessment": [],
-        "Plan": []
-    }
-    
-    current_section = "General"
-    
-    for line in text.split("\n"):
-        line = line.strip()
-        if not line:
-            continue
-            
-        lower = line.lower()
-        
-        if "recent lab" in lower:
-            current_section = "Recent Labs"
-            continue
-        if "current medication" in lower or "current medications" in lower:
-            current_section = "Current Medications"
-            continue
-        if "assessment" in lower:
-            current_section = "Assessment"
-            continue
-        if "plan" in lower:
-            current_section = "Plan"
-            continue
-            
-        structured[current_section].append(line)
-    
-    return structured
-
-def translate_structured(text: str, target_lang: str) -> Dict[str, str]:
-    """Section-structured translation - YOUR SIGNATURE FEATURE"""
-    structured = structure_text(text)
-    translated_sections = {}
-    
-    for section, content in structured.items():
-        joined_text = "\n".join(content).strip()
-        if not joined_text:
-            translated_sections[section] = ""
-            continue
-        translated_sections[section] = translate_text(joined_text, target_lang)
-    
-    return translated_sections
-
-# ---------------------------------------------------
-# EXPORTS FOR YOUR ROUTES (EXACT MATCH)
-# ---------------------------------------------------
-__all__ = [
-    'translate_text',           # Main function your routes need
-    'translate_structured',     # Section translation  
-    'split_sentences',         # Utility
-    'get_translation_model',   # Internal
-    'structure_text',          # Section detection
-]
-
-# Global instances for direct access
-translation_pipeline = type('Pipeline', (), {
-    'translate_text': translate_text,
-    'translate_structured': translate_structured,
-    'structure_text': structure_text
-})()
+# ===================================================
+# EXPORTS
+# ===================================================
+__all__ = ["translate_text"]

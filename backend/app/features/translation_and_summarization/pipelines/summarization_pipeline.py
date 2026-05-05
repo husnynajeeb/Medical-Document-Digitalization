@@ -1,198 +1,297 @@
-import os
+import re
 import torch
-from typing import Dict, List
 from transformers import AutoTokenizer, T5ForConditionalGeneration
+
 from app.features.translation_and_summarization.config import DEVICE, T5_MODEL_PATH
 
+
+# ===================================================
+# MODEL HOLDERS
+# ===================================================
 t5_tokenizer = None
 t5_model = None
 
 
+# ===================================================
+# MODEL LOADING
+# ===================================================
 def load_t5_model():
-    """Lazy-load tokenizer and model so app import doesn't crash immediately."""
     global t5_tokenizer, t5_model
 
     if t5_tokenizer is None or t5_model is None:
-        print("Loading Clinical T5 Model...")
-        print("T5_MODEL_PATH:", repr(T5_MODEL_PATH))
-        print("Path exists:", os.path.exists(T5_MODEL_PATH))
-        print("Is directory:", os.path.isdir(T5_MODEL_PATH))
-
-        if os.path.isdir(T5_MODEL_PATH):
-            print("Files in model folder:", os.listdir(T5_MODEL_PATH))
-
         try:
-            t5_tokenizer = AutoTokenizer.from_pretrained(T5_MODEL_PATH, use_fast=True)
+            print("✅ Loading Clinical T5 model...")
+            t5_tokenizer = AutoTokenizer.from_pretrained(T5_MODEL_PATH)
             t5_model = T5ForConditionalGeneration.from_pretrained(T5_MODEL_PATH).to(DEVICE)
             t5_model.eval()
-            print("✅ Clinical T5 loaded for specialized summaries")
         except Exception as e:
-            print("❌ Failed to load Clinical T5 model/tokenizer")
-            raise RuntimeError(
-                f"Could not load T5 model from {T5_MODEL_PATH}. "
-                f"The folder may be missing tokenizer files or may be incomplete. "
-                f"Original error: {e}"
-            ) from e
+            print("❌ T5 model load failed:", str(e))
+            t5_tokenizer = None
+            t5_model = None
 
     return t5_tokenizer, t5_model
 
 
-# ---------------------------------------------------
-# SPECIALIZED PROMPTS - YOUR EXACT REQUIREMENT
-# ---------------------------------------------------
-def build_specialized_prompt(text: str, summary_type: str) -> str:
-    """Patient: status/meds/plan | Medical: labs/conditions"""
+# ===================================================
+# CLINICAL DATA EXTRACTION
+# ===================================================
+LAB_PATTERNS = {
+    "HbA1c": r"HbA1c[:\s]*([\d.]+)\s*%",
+    "LDL": r"LDL[:\s]*([\d.]+)\s*mg/dL",
+    "HDL": r"HDL[:\s]*([\d.]+)\s*mg/dL",
+    "BP": r"BP[:\s]*([\d]{2,3}/[\d]{2,3})(?:\s*mmHg)?",
+    "eGFR": r"eGFR[:\s]*([\d.]+)",
+    "Total Cholesterol": r"TOTAL\s+CHOLESTEROL[:\s]*([\d.]+)\s*mg/dl",
+    "Triglycerides": r"TRIGLYCERIDES[:\s]*([\d.]+)\s*mg/dl",
+}
+
+
+def extract_clinical_data(text: str) -> dict:
+    labs = {}
+
+    for key, pattern in LAB_PATTERNS.items():
+        match = re.search(pattern, text, re.IGNORECASE)
+
+        if match:
+            value = match.group(1)
+
+            if key == "BP":
+                labs[key] = f"{value} mmHg"
+            elif key == "HbA1c":
+                labs[key] = f"{value}%"
+            elif key in ["LDL", "HDL", "Total Cholesterol", "Triglycerides"]:
+                labs[key] = f"{value} mg/dL"
+            else:
+                labs[key] = value
+
+    return labs
+
+
+# ===================================================
+# ABNORMALITY DETECTION
+# ===================================================
+def detect_abnormalities(text: str):
+    abnormalities = []
+
+    if re.search(r"\bhigh\b|\belevated\b", text, re.IGNORECASE):
+        abnormalities.append("High values detected")
+
+    if re.search(r"\blow\b|\breduced\b", text, re.IGNORECASE):
+        abnormalities.append("Low values detected")
+
+    return abnormalities
+
+
+# ===================================================
+# FALLBACK SUMMARY
+# ===================================================
+def fallback_summary(text: str, summary_type: str = "patient") -> str:
+    labs = extract_clinical_data(text)
+    abnormalities = detect_abnormalities(text)
+
+    parts = []
+
+    if labs:
+        lab_text = ", ".join([f"{k}: {v}" for k, v in labs.items()])
+        parts.append(f"Key findings: {lab_text}")
+
+    if abnormalities:
+        parts.append("Clinical note: " + ", ".join(abnormalities))
+
+    if "cholesterol" in text.lower():
+        parts.append("This report includes cholesterol-related results.")
+
+    if "triglycerides" in text.lower():
+        parts.append("Triglyceride level is included in the report.")
+
+    if "blood sugar" in text.lower() or "glucose" in text.lower():
+        parts.append("Blood sugar-related information is included.")
+
+    if parts:
+        return ". ".join(parts) + "."
+
+    return text[:350].strip()
+
+
+# ===================================================
+# CLEAN INPUT PROMPT
+# ===================================================
+def build_clean_input(text: str, summary_type: str) -> str:
+    text = re.sub(r"(\w+):\s*([^\.\n]+)", r"\1 is \2.", text)
 
     if summary_type == "patient":
-        return """Patient-friendly summary: Focus ONLY on:
-1. Current health status
-2. Current medications (with doses)
-3. Treatment plan/next steps
+        return f"""
+Summarize this medical information for a patient in simple language.
+Keep the original medical values accurate.
+Do not add new advice that is not present in the text.
 
-Use simple language. Keep ALL drug names, doses, numbers EXACTLY as written.
-
-{text}""".format(text=text)
+{text}
+"""
 
     if summary_type == "medical":
-        return """Medical summary: Focus ONLY on:
-1. Lab test values (HbA1c, eGFR, creatinine, etc.)
-2. Diagnoses/conditions
-3. Objective clinical data
+        return f"""
+Write a concise clinical summary.
+Preserve key medical values, units, and abnormal findings.
+Do not invent new diagnosis.
 
-Keep ALL lab values, numbers, medical terms EXACTLY as written.
+{text}
+"""
 
-{text}""".format(text=text)
-
-    raise ValueError("summary_type must be 'patient' or 'medical'")
-
-
-# ---------------------------------------------------
-# SECTION-AWARE SUMMARIZATION
-# ---------------------------------------------------
-def extract_clinical_sections(text: str) -> Dict[str, List[str]]:
-    """Extract relevant sections for targeted summaries"""
-    sections = {
-        "status": [],
-        "medications": [],
-        "labs": [],
-        "conditions": [],
-        "plan": []
-    }
-
-    lines = text.split('\n')
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
-
-        lower = line.lower()
-
-        # Status/conditions
-        if any(word in lower for word in ['presents', 'history', 'reports', 'complains']):
-            sections["status"].append(line)
-
-        # Medications
-        if any(drug in line for drug in ['mg ', 'BID', 'daily', 'nightly', 'Metformin', 'Amlodipine']):
-            sections["medications"].append(line)
-
-        # Labs
-        if any(lab in line for lab in ['HbA1c', 'eGFR', 'creatinine', 'mg/dL', 'mmHg']):
-            sections["labs"].append(line)
-
-        # Plan
-        if any(word in lower for word in ['plan', 'increase', 'add', 'continue', 'monitor', 'refer']):
-            sections["plan"].append(line)
-
-    return sections
+    return text
 
 
-# ---------------------------------------------------
-# TARGETED SUMMARY GENERATION
-# ---------------------------------------------------
+# ===================================================
+# OUTPUT CLEANER
+# ===================================================
+def clean_output(text: str) -> str:
+    if not text:
+        return ""
+
+    text = re.sub(
+        r"(Summarize.*|Write.*|Preserve.*|Do not.*|Keep.*)",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    text = re.sub(r"[-•]\s*", "", text)
+    text = re.sub(r"\s+", " ", text)
+
+    return text.strip()
+
+
+# ===================================================
+# STRUCTURED EXTRACTION
+# ===================================================
+def extract_sections(text: str):
+    symptoms = []
+    meds = []
+
+    symptom_keywords = ["fatigue", "pain", "fever", "urination", "dizziness", "weakness"]
+
+    for word in symptom_keywords:
+        if word in text.lower():
+            symptoms.append(word)
+
+    meds.extend(re.findall(r"(Metformin\s*\d+mg)", text, re.IGNORECASE))
+
+    return symptoms, meds
+
+
+# ===================================================
+# SAFE MEDICAL SUMMARY BUILDER
+# ===================================================
+def build_safe_medical_summary(model_summary: str, labs: dict, text: str) -> str:
+    symptoms, meds = extract_sections(text)
+    abnormalities = detect_abnormalities(text)
+
+    ordered_keys = [
+        "HbA1c",
+        "LDL",
+        "HDL",
+        "Total Cholesterol",
+        "Triglycerides",
+        "BP",
+        "eGFR",
+    ]
+
+    lab_parts = [f"{k}: {labs[k]}" for k in ordered_keys if k in labs]
+
+    parts = []
+
+    if lab_parts:
+        parts.append("Key Findings: " + ", ".join(lab_parts))
+
+    if abnormalities:
+        parts.append("Abnormalities: " + ", ".join(abnormalities))
+
+    if symptoms:
+        parts.append("Symptoms: " + ", ".join(symptoms))
+
+    if meds:
+        parts.append("Medications: " + ", ".join(meds))
+
+    if parts:
+        return ". ".join(parts) + "."
+
+    return model_summary if model_summary else fallback_summary(text, "medical")
+
+
+# ===================================================
+# CORE PIPELINE
+# ===================================================
 def summarize_section_aware(text: str, summary_type: str) -> str:
-    """Generate specialized summaries based on clinical focus"""
-
-    if len(text.split()) < 30:
-        return text
+    if not text or len(text.split()) < 5:
+        return text or ""
 
     tokenizer, model = load_t5_model()
-    sections = extract_clinical_sections(text)
 
-    if summary_type == "patient":
-        patient_content = (
-            '\n'.join(sections["status"]) + '\n' +
-            '\n'.join(sections["medications"]) + '\n' +
-            '\n'.join(sections["plan"])
-        )
-        if patient_content.strip():
-            prompt = build_specialized_prompt(patient_content.strip(), "patient")
-        else:
-            prompt = build_specialized_prompt(text, "patient")
+    if tokenizer is None or model is None:
+        return fallback_summary(text, summary_type)
 
-    else:  # medical
-        medical_content = (
-            '\n'.join(sections["labs"]) + '\n' +
-            '\n'.join(sections["status"])
-        )
-        if medical_content.strip():
-            prompt = build_specialized_prompt(medical_content.strip(), "medical")
-        else:
-            prompt = build_specialized_prompt(text, "medical")
+    try:
+        labs = extract_clinical_data(text)
+        clean_input = build_clean_input(text, summary_type)
 
-    inputs = tokenizer(
-        prompt,
-        return_tensors="pt",
-        truncation=True,
-        max_length=512
-    ).to(DEVICE)
+        inputs = tokenizer(
+            clean_input,
+            return_tensors="pt",
+            truncation=True,
+            max_length=512,
+        ).to(DEVICE)
 
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_length=200,
-            num_beams=4,
-            early_stopping=True,
-            length_penalty=0.9,
-            do_sample=False
-        )
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                max_length=140,
+                num_beams=4,
+                repetition_penalty=1.2,
+                no_repeat_ngram_size=3,
+                early_stopping=True,
+            )
 
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+        summary = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        summary = clean_output(summary)
+
+        if not summary or len(summary.split()) < 5:
+            return fallback_summary(text, summary_type)
+
+        if summary_type == "patient":
+            return summary
+
+        if summary_type == "medical":
+            return build_safe_medical_summary(summary, labs, text)
+
+        return summary
+
+    except Exception as e:
+        print("❌ Summarization error:", str(e))
+        return fallback_summary(text, summary_type)
 
 
-# ---------------------------------------------------
-# MAIN API FUNCTIONS
-# ---------------------------------------------------
+# ===================================================
+# PUBLIC API
+# ===================================================
 def summarize_text(text: str, summary_type: str = "patient") -> str:
-    """Main function - YOUR ORIGINAL SIGNATURE"""
     if summary_type not in ["patient", "medical"]:
         return text
-
-    if len(text.split()) < 40:
-        return text
-
     return summarize_section_aware(text, summary_type)
 
 
 def summarize_patient_friendly(text: str) -> str:
-    """Patient-focused: status, medications, plan"""
     return summarize_section_aware(text, "patient")
 
 
 def summarize_medical(text: str) -> str:
-    """Medical-focused: labs, conditions"""
     return summarize_section_aware(text, "medical")
 
 
-# ---------------------------------------------------
-# BACKWARD COMPATIBILITY
-# ---------------------------------------------------
 summarize = summarize_text
 
 
-# ✅ EXPORTS FOR YOUR ROUTES
 __all__ = [
-    'summarize_text',
-    'summarize_patient_friendly',
-    'summarize_medical',
-    'summarize'
+    "summarize_text",
+    "summarize_patient_friendly",
+    "summarize_medical",
+    "summarize",
 ]

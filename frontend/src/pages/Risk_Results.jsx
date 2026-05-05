@@ -43,6 +43,8 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
+import MultilingualPanel from '../components/MultilingualPanel'
+
 const getRiskColor = (level) => {
   switch (level?.toLowerCase()) {
     case 'high':
@@ -100,16 +102,7 @@ const renderRecommendationRow = (rec, index) => {
   if (type === 'section-red') {
     return (
       <Box key={index} sx={{ mt: index === 0 ? 0 : 3, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Box
-          sx={{
-            width: 18,
-            height: 18,
-            borderRadius: '50%',
-            bgcolor: '#f44336',
-            border: '1px solid #000',
-            flexShrink: 0,
-          }}
-        />
+        <Box sx={{ width: 18, height: 18, borderRadius: '50%', bgcolor: '#f44336', border: '1px solid #000' }} />
         <Typography sx={{ color: '#1565c0', fontSize: '2rem', fontWeight: 500 }}>
           {rec.replace('🔴', '').trim()}
         </Typography>
@@ -120,16 +113,7 @@ const renderRecommendationRow = (rec, index) => {
   if (type === 'section-yellow') {
     return (
       <Box key={index} sx={{ mt: 3, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Box
-          sx={{
-            width: 18,
-            height: 18,
-            borderRadius: '50%',
-            bgcolor: '#ffeb3b',
-            border: '1px solid #000',
-            flexShrink: 0,
-          }}
-        />
+        <Box sx={{ width: 18, height: 18, borderRadius: '50%', bgcolor: '#ffeb3b', border: '1px solid #000' }} />
         <Typography sx={{ color: '#1565c0', fontSize: '2rem', fontWeight: 500 }}>
           {rec.replace('🟡', '').trim()}
         </Typography>
@@ -140,16 +124,7 @@ const renderRecommendationRow = (rec, index) => {
   if (type === 'section-green') {
     return (
       <Box key={index} sx={{ mt: 3, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Box
-          sx={{
-            width: 18,
-            height: 18,
-            borderRadius: '50%',
-            bgcolor: '#4caf50',
-            border: '1px solid #000',
-            flexShrink: 0,
-          }}
-        />
+        <Box sx={{ width: 18, height: 18, borderRadius: '50%', bgcolor: '#4caf50', border: '1px solid #000' }} />
         <Typography sx={{ color: '#1565c0', fontSize: '2rem', fontWeight: 500 }}>
           {rec.replace('🟢', '').trim()}
         </Typography>
@@ -167,34 +142,8 @@ const renderRecommendationRow = (rec, index) => {
     )
   }
 
-  if (type === 'boxed-header') {
-    return (
-      <Paper
-        key={index}
-        variant="outlined"
-        sx={{
-          p: 1.5,
-          mb: 2,
-          borderRadius: 1,
-          bgcolor: '#fff',
-        }}
-      >
-        <Typography variant="body1">{rec}</Typography>
-      </Paper>
-    )
-  }
-
   return (
-    <Paper
-      key={index}
-      variant="outlined"
-      sx={{
-        p: 1.5,
-        mb: 2,
-        borderRadius: 1,
-        bgcolor: '#fff',
-      }}
-    >
+    <Paper key={index} variant="outlined" sx={{ p: 1.5, mb: 2, borderRadius: 1, bgcolor: '#fff' }}>
       <Typography variant="body1">{rec}</Typography>
     </Paper>
   )
@@ -229,6 +178,33 @@ const Results = () => {
     model_type,
   } = results
 
+  const buildPredictionText = () => {
+    return `
+Diabetes Prediction: ${diabetes_prediction}
+Probability: ${(diabetes_probability * 100).toFixed(1)}%
+
+Overall Risk: ${risk_assessment?.overall_risk}
+Overall Score: ${risk_assessment?.overall_score}/30
+Urgency: ${risk_assessment?.urgency}
+
+Risk Breakdown:
+${risk_breakdown?.map((r) => `${r.type}: ${r.level} risk, score ${r.score}`).join('\n') || ''}
+
+Recommendations:
+${recommendations?.join('\n') || ''}
+
+Patient Data:
+Age: ${patientData?.age} years
+Gender: ${patientData?.gender}
+BMI: ${patientData?.bmi}
+HbA1c: ${patientData?.HbA1c_level}%
+Blood Glucose: ${patientData?.blood_glucose_level} mg/dL
+Hypertension: ${patientData?.hypertension ? 'Yes' : 'No'}
+Heart Disease: ${patientData?.heart_disease ? 'Yes' : 'No'}
+Smoking History: ${patientData?.smoking_history}
+`
+  }
+
   const pieData =
     risk_breakdown?.map((risk) => ({
       name: risk.type,
@@ -251,7 +227,6 @@ const Results = () => {
         Risk Assessment Results
       </Typography>
 
-      {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={4}>
           <Card sx={{ bgcolor: getRiskColor(risk_assessment?.overall_risk), color: 'white' }}>
@@ -320,18 +295,22 @@ const Results = () => {
           </Card>
         </Grid>
       </Grid>
-
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', maxWidth: '100%', overflowX: 'auto' }}>
+        <Tabs
+          value={tabValue}
+          onChange={(e, v) => setTabValue(v)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+        >
           <Tab label="Risk Breakdown" />
           <Tab label="Recommendations" />
           <Tab label="Patient Data" />
           <Tab label="Visualizations" />
+          <Tab label="Multilingual Analysis" />
         </Tabs>
       </Box>
 
-      {/* Risk Breakdown Tab */}
       <TabPanel value={tabValue} index={0}>
         <TableContainer component={Paper}>
           <Table>
@@ -367,14 +346,12 @@ const Results = () => {
         </TableContainer>
       </TabPanel>
 
-      {/* Recommendations Tab */}
       <TabPanel value={tabValue} index={1}>
         <Box sx={{ bgcolor: '#f5f5f5', p: 2, borderRadius: 1 }}>
           {recommendations?.map((rec, index) => renderRecommendationRow(rec, index))}
         </Box>
       </TabPanel>
 
-      {/* Patient Data Tab */}
       <TabPanel value={tabValue} index={2}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
@@ -432,36 +409,16 @@ const Results = () => {
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Button
-                    variant="contained"
-                    startIcon={<LocalHospital />}
-                    fullWidth
-                    onClick={() => window.open('https://www.google.com/maps/search/endocrinologist+near+me', '_blank')}
-                  >
+                  <Button variant="contained" startIcon={<LocalHospital />} fullWidth onClick={() => window.open('https://www.google.com/maps/search/endocrinologist+near+me', '_blank')}>
                     Find Endocrinologist
                   </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Restaurant />}
-                    fullWidth
-                    onClick={() => window.open('https://www.diabetes.org/healthy-living/recipes-nutrition', '_blank')}
-                  >
+                  <Button variant="outlined" startIcon={<Restaurant />} fullWidth onClick={() => window.open('https://www.diabetes.org/healthy-living/recipes-nutrition', '_blank')}>
                     Healthy Recipes
                   </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<FitnessCenter />}
-                    fullWidth
-                    onClick={() => window.open('https://www.diabetes.org/healthy-living/fitness', '_blank')}
-                  >
+                  <Button variant="outlined" startIcon={<FitnessCenter />} fullWidth onClick={() => window.open('https://www.diabetes.org/healthy-living/fitness', '_blank')}>
                     Exercise Guidelines
                   </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Medication />}
-                    fullWidth
-                    onClick={() => window.open('https://www.diabetes.org/diabetes/medication-management', '_blank')}
-                  >
+                  <Button variant="outlined" startIcon={<Medication />} fullWidth onClick={() => window.open('https://www.diabetes.org/diabetes/medication-management', '_blank')}>
                     Medication Info
                   </Button>
                 </Box>
@@ -471,64 +428,74 @@ const Results = () => {
         </Grid>
       </TabPanel>
 
-    {/* Visualizations Tab */}
-<TabPanel value={tabValue} index={3}>
-  <Container maxWidth="false"> {/* Controls the overall container width */}
-    <Grid container spacing={3}>
-      {/* Full-width Pie Chart */}
-      <Grid item xs={12} md={12}> {/* Fixed: was md={20}, now md={12} */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom align="center">
-              Risk Distribution
-            </Typography>
-            <ResponsiveContainer width={600} height={300}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
-                  outerRadius={100} 
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </Grid>
+      <TabPanel value={tabValue} index={3}>
+        <Container maxWidth={false}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom align="center">
+                    Risk Distribution
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
 
-      {/* Half-width Bar Chart */}
-      <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom align="center">
+                    Risk Levels by Category
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={pieData}>
+                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="value" fill="#1976d2" name="Risk Score" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Container>
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={4}>
         <Card>
           <CardContent>
-            <Typography variant="h6" gutterBottom align="center">
-              Risk Levels by Category
+            <Typography variant="h6" gutterBottom>
+              🌍 Multilingual Risk Prediction Output
             </Typography>
-            <ResponsiveContainer width={500} height={300}>
-              <BarChart data={pieData}>
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#1976d2" name="Risk Score" />
-              </BarChart>
-            </ResponsiveContainer>
+
+            <MultilingualPanel
+              inputType="prediction"
+              text={buildPredictionText()}
+            />
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
-  </Container>
-</TabPanel>
+      </TabPanel>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
         <Button variant="contained" size="large" onClick={() => navigate('/predict')}>

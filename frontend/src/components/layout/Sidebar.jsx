@@ -1,6 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, FileText, BarChart3, Activity, LogOut } from "lucide-react";
 
+// 🌍 language switcher
+import LanguageSwitcher from "./LanguageSwitcher";
+
 export default function Sidebar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -24,8 +27,10 @@ export default function Sidebar() {
 
   return (
     <aside className="w-72 bg-blue-50 border border-gray-200 rounded-r-2xl shadow-lg flex flex-col min-h-screen">
+
       {/* TOP SECTION */}
       <div>
+
         {/* LOGO */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
@@ -45,6 +50,7 @@ export default function Sidebar() {
 
         {/* NAVIGATION */}
         <nav className="p-4 mt-4 flex flex-col">
+
           <Link to="/" className={linkStyle("/")}>
             <Home size={20} className={iconStyle("/")} />
             <span>Dashboard</span>
@@ -70,23 +76,32 @@ export default function Sidebar() {
             <span>Interpretation History</span>
           </Link>
 
-          {/* ✅ Added: Prediction */}
           <Link to="/prediction" className={linkStyle("/prediction")}>
             <FileText size={20} className={iconStyle("/prediction")} />
             <span>Diabetes Prediction</span>
           </Link>
+
           <Link to="/risk" className={linkStyle("/risk")}>
             <BarChart3 size={20} className={iconStyle("/risk")} />
-            <span>Risks and Recommendations</span></Link>
+            <span>Risks and Recommendations</span>
+          </Link>
+
           <Link to="/translator" className={linkStyle("/translator")}>
             <FileText size={18} className={iconStyle("/translator")} />
             <span>Translation & Summarization</span>
           </Link>
+
+          {/* 🌍 LANGUAGE SWITCHER */}
+          <div className="mt-6 px-2">
+            <LanguageSwitcher />
+          </div>
+
         </nav>
       </div>
 
       {/* BOTTOM SECTION */}
       <div className="mt-auto p-4 border-t border-gray-200">
+
         <button
           onClick={logout}
           className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-xl transition"
@@ -94,6 +109,7 @@ export default function Sidebar() {
           <LogOut size={18} />
           <span>Logout</span>
         </button>
+
       </div>
     </aside>
   );

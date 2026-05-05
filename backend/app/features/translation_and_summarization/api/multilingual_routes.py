@@ -7,14 +7,14 @@ from app.features.translation_and_summarization.schemas.request_schema import (
 )
 
 from app.features.translation_and_summarization.pipelines.tts_pipeline import generate_tts
-
 from app.features.translation_and_summarization.core.unified_processor import process_input
+
 
 router = APIRouter()
 
 
 # ===================================================
-# 🧠 UNIFIED PROCESS ENDPOINT (FINAL CORE API)
+# 🧠 UNIFIED PROCESS ENDPOINT
 # ===================================================
 @router.post("/process")
 def process_endpoint(req: TranslateRequest):
@@ -22,8 +22,13 @@ def process_endpoint(req: TranslateRequest):
     # ===================================================
     # VALIDATION
     # ===================================================
-    if not req.input_type:
-        raise HTTPException(status_code=400, detail="input_type is required")
+    allowed_types = ["text", "image", "prediction"]
+
+    if not req.input_type or req.input_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid input_type. Allowed: {allowed_types}"
+        )
 
     if req.input_type == "text" and not req.text:
         raise HTTPException(status_code=400, detail="Text input missing")
@@ -33,34 +38,53 @@ def process_endpoint(req: TranslateRequest):
 
     try:
         # ===================================================
-        # CALL UNIFIED PROCESSOR (ALL LOGIC HANDLED THERE)
+        # CORE PROCESSING
         # ===================================================
         result = process_input(
             input_type=req.input_type,
             text=req.text,
-            image=req.image_base64,
+            image_base64=req.image_base64,
             target_lang=req.target_lang,
             summarize=req.summarize
         )
 
-        return result
+        # ===================================================
+        # STANDARD RESPONSE FORMAT
+        # ===================================================
+        return {
+            "status": "success",
+            "data": result
+        }
+
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error during processing"
+        )
 
 
 # ===================================================
-# 🔊 TEXT TO SPEECH (UNCHANGED)
+# 🔊 TEXT TO SPEECH
 # ===================================================
 @router.post("/tts")
 def text_to_speech(req: TTSRequest):
 
-    if not req.text.strip():
+    if not req.text or not req.text.strip():
         raise HTTPException(status_code=400, detail="Empty text")
 
-    audio = generate_tts(req.text, req.target_lang)
+    try:
+        audio = generate_tts(req.text, req.target_lang)
 
-    return StreamingResponse(
-        audio,
-        media_type="audio/mpeg"
-    )
+        return StreamingResponse(
+            audio,
+            media_type="audio/mpeg"
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="TTS generation failed"
+        )
