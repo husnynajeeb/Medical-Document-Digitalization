@@ -1,54 +1,23 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { jsPDF } from "jspdf";
-import MultilingualPanel from "../components/MultilingualPanel";
 
 export default function Results() {
   const [results, setResults] = useState([]);
   const [combined, setCombined] = useState([]);
-  const [selectedText, setSelectedText] = useState("");
-
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ===================================================
-  // 🧠 BUILD TEXT FOR MULTILINGUAL PROCESSING
-  // ===================================================
-  const buildMedicalText = (resultsData, combinedData) => {
-    let text = "";
-
-    resultsData.forEach((test) => {
-      text += `${test.test}: ${test.value} ${test.unit}. `;
-      text += `Status: ${test.status}. `;
-      text += `Range: ${test.range}. `;
-      text += `${test.meaning}. `;
-      text += `${test.advice}. `;
-    });
-
-    combinedData.forEach((block) => {
-      text += `Overall Interpretation: ${block.interpretation}. `;
-    });
-
-    return text;
-  };
-
-  // ===================================================
-  // LOAD DATA
-  // ===================================================
+  // Load results safely from location.state
   useEffect(() => {
     if (location.state && location.state.results) {
+      // Wrap in a microtask to avoid synchronous setState warning
       Promise.resolve().then(() => {
-        const res = location.state.results;
-        const comb = location.state.combined_interpretation || [];
-
-        setResults(res);
-        setCombined(comb);
-
-        // 🔥 Prepare text for multilingual processing
-        const text = buildMedicalText(res, comb);
-        setSelectedText(text);
+        setResults(location.state.results);
+        setCombined(location.state.combined_interpretation || []);
       });
     } else {
+      // Navigate outside setState to prevent cascading render
       navigate("/upload");
     }
   }, [location.state, navigate]);
@@ -61,9 +30,6 @@ export default function Results() {
     );
   }
 
-  // ===================================================
-  // PDF GENERATION
-  // ===================================================
   const drawWrappedText = (doc, text, x, y, maxWidth, lineHeight = 6) => {
     const lines = doc.splitTextToSize(text, maxWidth);
     lines.forEach((line) => {
@@ -170,77 +136,77 @@ export default function Results() {
     doc.save("Medical_Report.pdf");
   };
 
-  // ===================================================
-  // UI
-  // ===================================================
   return (
     <div className="flex min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl w-full space-y-6 mx-auto">
-
-        {/* ================= RESULTS ================= */}
         {results.map((test, i) => (
           <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="p-8 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-3xl font-bold text-gray-800">{test.test}</h2>
               <span
-                className={`px-4 py-2 rounded-full font-semibold ${
+                className={`px-4 py-2 rounded-full font-semibold flex items-center space-x-2 ${
                   test.status === "High"
                     ? "bg-red-100 text-red-700"
                     : "bg-green-100 text-green-700"
                 }`}
               >
-                {test.status}
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    test.status === "High" ? "bg-red-600" : "bg-green-600"
+                  }`}
+                />
+                <span>{test.status}</span>
               </span>
             </div>
 
             <div className="p-8 bg-gray-50">
               <div className="flex items-baseline space-x-3 mb-3">
                 <span className="text-6xl font-bold text-gray-800">{test.value}</span>
-                <span className="text-2xl text-gray-600">{test.unit}</span>
+                <span className="text-2xl text-gray-600 font-medium">{test.unit}</span>
               </div>
-
-              <p className="text-gray-600 mb-2">
-                Range: <strong>{test.range}</strong>
+              <p className="text-base text-gray-500 mb-3">
+                Normal Range: <span className="font-semibold text-gray-700">{test.range}</span>
               </p>
-
-              <p className="text-gray-700 mb-2">{test.meaning}</p>
-              <p className="text-gray-500">{test.advice}</p>
+              <h3 className="text-lg font-bold text-gray-800 mb-1">What This Means</h3>
+              <p className="text-base text-gray-600 mb-3">{test.meaning}</p>
+              <h3 className="text-lg font-bold text-gray-800 mb-1">Interpretation</h3>
+              <p className="text-base text-gray-600">{test.advice}</p>
             </div>
           </div>
         ))}
 
-        {/* ================= COMBINED ================= */}
         {combined.length > 0 && (
           <div className="bg-white rounded-2xl shadow-xl p-8">
             {combined.map((block, idx) => (
-              <div key={idx}>
-                <h2 className="text-xl font-bold text-blue-700 mb-3">
-                  Combined Interpretation
-                </h2>
-                <p>{block.interpretation}</p>
+              <div key={idx} className="space-y-4">
+                <h2 className="text-2xl font-bold text-blue-700 mb-4">Combined Interpretation</h2>
+                {block.results.map((test, i) => (
+                  <div key={i} className="p-4 border rounded-xl border-gray-200">
+                    <div className="flex justify-between items-center mb-1">
+                      <h3 className="font-semibold text-gray-800">{test.test} ({test.unit})</h3>
+                      <span
+                        className={`px-3 py-1 rounded-full font-semibold text-sm ${
+                          test.status === "High" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {test.status}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mb-1">{test.meaning}</p>
+                    <p className="text-gray-500 text-sm">Range: {test.range}</p>
+                    <p className="text-gray-500 text-sm">Value: {test.value}</p>
+                  </div>
+                ))}
+                <h3 className="text-lg font-bold mt-4 text-gray-800">Overall Interpretation</h3>
+                <p className="text-gray-600">{block.interpretation}</p>
               </div>
             ))}
           </div>
         )}
 
-        {/* ================= 🌍 MULTILINGUAL ================= */}
-        {selectedText && (
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <h2 className="text-xl font-bold text-blue-700 mb-4">
-              🌍 Multilingual Processing
-            </h2>
-
-            <MultilingualPanel
-              inputType="text"
-              text={selectedText}
-            />
-          </div>
-        )}
-
-        {/* ================= DOWNLOAD ================= */}
         <button
           onClick={downloadPDF}
-          className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700"
+          className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-blue-700 transition mt-4"
         >
           Download PDF
         </button>
